@@ -1,0 +1,534 @@
+{% extends "base.html" %}
+
+{% block title %}Productos - Mi Tienda Online{% endblock %}
+
+{% block content %}
+
+<!-- Sección de Características -->
+<div class="features-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h5>Entrega Rápida</h5>
+                    <p>Recibe tus pedidos en tiempo récord</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h5>Calidad Premium</h5>
+                    <p>Productos seleccionados con los más altos estándares</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h5>Hecho con Amor</h5>
+                    <p>Cada producto preparado con pasión y dedicación</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Productos -->
+<div class="products-section" id="productos">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="section-title">
+                    <i class="fas fa-store text-primary"></i>
+                    Nuestros Productos
+                </h2>
+                <p class="section-subtitle">
+                    Descubre nuestra selección de productos frescos y deliciosos
+                </p>
+            </div>
+        </div>
+        
+        <!-- Filtros de Categorías -->
+        {% if categorias %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="category-filters">
+                    <button class="btn btn-outline-primary category-btn active" data-category="all">
+                        <i class="fas fa-th"></i> Todos
+                    </button>
+                    {% for categoria in categorias %}
+                    <button class="btn btn-outline-primary category-btn" data-category="{{ categoria.id }}" style="border-color: {{ categoria.color }}; color: {{ categoria.color }};">
+                        <i class="{{ categoria.icono }}"></i> {{ categoria.nombre }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container">
+    <div class="row" id="productos-container">
+        {% for producto in productos %}
+        <div class="col-md-4 col-lg-3 mb-4 product-item" data-category="{{ producto.categoria_id or 'sin-categoria' }}">
+            <div class="card product-card h-100 shadow-sm">
+                <div class="product-image-container">
+                    {% if producto.imagen %}
+                    <img src="{{ producto.imagen }}" class="card-img-top product-image" alt="{{ producto.nombre }}">
+                    {% else %}
+                    <div class="card-img-top product-image d-flex align-items-center justify-content-center bg-gradient">
+                        <i class="fas fa-image fa-3x text-white"></i>
+                    </div>
+                    {% endif %}
+                    <div class="product-overlay">
+                        <div class="product-badge">
+                            {% if producto.stock > 0 %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check"></i> Disponible
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-times"></i> Agotado
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% if producto.categoria %}
+                        <div class="category-badge">
+                            <span class="badge" style="background-color: {{ producto.categoria.color }};">
+                                <i class="{{ producto.categoria.icono }}"></i> {{ producto.categoria.nombre }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title product-title">{{ producto.nombre }}</h5>
+                    <p class="card-text text-muted flex-grow-1 product-description">{{ producto.descripcion }}</p>
+                    
+                    <div class="mt-auto">
+                        <div class="product-price">
+                            <span class="price-currency">$</span>
+                            <span class="price-amount">{{ "%.2f"|format(producto.precio) }}</span>
+                        </div>
+                        
+                        {% if producto.stock > 0 %}
+                        <button class="btn btn-primary w-100 add-to-cart-btn" onclick="addToCart({{ producto.id }}, '{{ producto.nombre|replace("'", "\\'") }}', {{ producto.precio }}, {{ producto.stock }})">
+                            <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                        </button>
+                        {% else %}
+                        <button class="btn btn-secondary w-100" disabled>
+                            <i class="fas fa-ban"></i> Sin Stock
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if not productos %}
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="empty-state">
+                <i class="fas fa-shopping-bag fa-4x text-muted mb-4"></i>
+                <h4>¡Próximamente!</h4>
+                <p class="text-muted">Estamos preparando productos increíbles para ti. ¡Vuelve pronto!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Sección de Contacto -->
+<div class="contact-section" id="contacto">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="section-title">
+                    <i class="fas fa-phone text-primary"></i>
+                    ¿Necesitas Ayuda?
+                </h2>
+                <p class="section-subtitle">
+                    Estamos aquí para ayudarte con cualquier consulta
+                </p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="contact-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-headset text-primary"></i> Atención al Cliente</h5>
+                            <p>Nuestro equipo está listo para ayudarte con cualquier pregunta sobre nuestros productos.</p>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <div class="contact-buttons">
+                                <a href="#" class="btn btn-success btn-lg" id="whatsapp-contact-btn">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* Features Section */
+    .features-section {
+        padding: 60px 0;
+        background: #f8f9fa;
+    }
+    
+    .feature-card {
+        text-align: center;
+        padding: 30px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .feature-card h5 {
+        color: #333;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+    
+    .feature-card p {
+        color: #666;
+        margin: 0;
+    }
+    
+    /* Products Section */
+    .products-section {
+        padding: 60px 0;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 3rem;
+    }
+    
+    /* Product Cards */
+    .product-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    
+    .product-image-container {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .product-image {
+        height: 200px;
+        object-fit: cover;
+        transition: all 0.3s ease;
+    }
+    
+    .product-card:hover .product-image {
+        transform: scale(1.1);
+    }
+    
+    .bg-gradient {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    
+    .product-overlay {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    
+    .product-badge .badge {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+        border-radius: 20px;
+    }
+    
+    .product-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .product-description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .product-price {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .price-currency {
+        font-size: 1.2rem;
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .price-amount {
+        font-size: 2rem;
+        color: #667eea;
+        font-weight: 700;
+    }
+    
+    .add-to-cart-btn {
+        border-radius: 25px;
+        padding: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    
+    .add-to-cart-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* Contact Section */
+    .contact-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    }
+    
+    .contact-card {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .contact-buttons .btn {
+        border-radius: 50px;
+        padding: 15px 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 60px 20px;
+    }
+    
+    .empty-state h4 {
+        color: #333;
+        margin-bottom: 15px;
+    }
+    
+    /* Category Filters */
+    .category-filters {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .category-btn {
+        border-radius: 25px;
+        padding: 10px 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        border: 2px solid;
+    }
+    
+    .category-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .category-btn.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    
+    .category-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+    }
+    
+    .category-badge .badge {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        border-radius: 15px;
+        color: white;
+    }
+    
+    .product-item {
+        transition: all 0.3s ease;
+    }
+    
+    .product-item.hidden {
+        display: none;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .category-filters {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .category-btn {
+            width: 200px;
+        }
+    }
+</style>
+
+<script>
+    // Configurar botón de WhatsApp de contacto
+    document.addEventListener('DOMContentLoaded', function() {
+        cargarWhatsAppContacto();
+        inicializarFiltrosCategoria();
+    });
+    
+    function cargarWhatsAppContacto() {
+        fetch('/api/configuracion/publica')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.configuracion.whatsapp_admin) {
+                    const whatsappBtn = document.getElementById('whatsapp-contact-btn');
+                    const cleanNumber = data.configuracion.whatsapp_admin.replace(/[^\d+]/g, '');
+                    whatsappBtn.href = `https://wa.me/${cleanNumber}?text=Hola! Me interesa hacer un pedido.`;
+                } else {
+                    // Ocultar botón si no hay WhatsApp configurado
+                    const whatsappBtn = document.getElementById('whatsapp-contact-btn');
+                    if (whatsappBtn) {
+                        whatsappBtn.style.display = 'none';
+                    }
+                }
+            })
+            .catch(error => {
+                console.log('No se pudo cargar la configuración de WhatsApp');
+            });
+    }
+    
+    function inicializarFiltrosCategoria() {
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remover clase active de todos los botones
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                
+                // Agregar clase active al botón clickeado
+                this.classList.add('active');
+                
+                // Obtener la categoría seleccionada
+                const categoriaId = this.getAttribute('data-category');
+                
+                // Filtrar productos
+                filtrarProductos(categoriaId);
+            });
+        });
+    }
+    
+    function filtrarProductos(categoriaId) {
+        const productos = document.querySelectorAll('.product-item');
+        
+        productos.forEach(producto => {
+            const productoCategory = producto.getAttribute('data-category');
+            
+            if (categoriaId === 'all' || productoCategory === categoriaId) {
+                producto.classList.remove('hidden');
+                producto.style.display = 'block';
+            } else {
+                producto.classList.add('hidden');
+                producto.style.display = 'none';
+            }
+        });
+        
+        // Mostrar mensaje si no hay productos en la categoría
+        mostrarMensajeCategoriaVacia(categoriaId);
+    }
+    
+    function mostrarMensajeCategoriaVacia(categoriaId) {
+        const productosVisibles = document.querySelectorAll('.product-item:not(.hidden)');
+        const container = document.getElementById('productos-container');
+        
+        // Remover mensaje anterior si existe
+        const mensajeAnterior = document.getElementById('mensaje-categoria-vacia');
+        if (mensajeAnterior) {
+            mensajeAnterior.remove();
+        }
+        
+        if (productosVisibles.length === 0) {
+            const mensaje = document.createElement('div');
+            mensaje.id = 'mensaje-categoria-vacia';
+            mensaje.className = 'col-12 text-center';
+            mensaje.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                    <h4>No hay productos en esta categoría</h4>
+                    <p class="text-muted">Prueba con otra categoría o vuelve a ver todos los productos.</p>
+                </div>
+            `;
+            container.appendChild(mensaje);
+        }
+    }
+</script>
+{% endblock %}

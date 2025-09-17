@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Tienda Online{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        .cart-total {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .btn-whatsapp {
+            background-color: #25D366;
+            border-color: #25D366;
+        }
+        .btn-whatsapp:hover {
+            background-color: #128C7E;
+            border-color: #128C7E;
+        }
+        
+        /* Estilos para notificaciones toast */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 15px 20px;
+            z-index: 9999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 250px;
+        }
+        
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toast-content i {
+            font-size: 18px;
+        }
+        
+        .toast-content span {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        /* Estilos para tarjetas de productos y pedidos */
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: 1px solid #e9ecef;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .card-footer {
+            border-top: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+        
+        .btn-group .btn {
+            border-radius: 0;
+        }
+        
+        .btn-group .btn:first-child {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+        
+        .btn-group .btn:last-child {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+        
+        .badge {
+            font-size: 0.75em;
+        }
+        
+        .text-success {
+            color: #198754 !important;
+        }
+        
+        .text-info {
+            color: #0dcaf0 !important;
+        }
+        
+        .text-warning {
+            color: #fd7e14 !important;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-store"></i> <span id="nombre-tienda">Mi Tienda Online</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Productos</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="/admin">Administración</a>
+                    </li> -->
+                </ul>
+                <div class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/admin">
+                                    <i class="fas fa-cogs"></i> Panel Admin
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/logout">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                    <button class="btn btn-success text-white ms-2" data-bs-toggle="modal" data-bs-target="#cartModal">
+                        <i class="fas fa-shopping-cart"></i> Carrito (<span id="cart-count">0</span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <!-- Mostrar mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Modal del Carrito -->
+    <div class="modal fade" id="cartModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-shopping-cart"></i> Carrito de Compras
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cart-items">
+                        <p class="text-muted">Tu carrito está vacío</p>
+                    </div>
+                    <div class="cart-total mt-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Total:</span>
+                            <span id="cart-total">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" id="clear-cart-btn" disabled>
+                        <i class="fas fa-trash"></i> Limpiar Carrito
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Seguir Comprando</button>
+                    <button type="button" class="btn btn-whatsapp text-white" id="checkout-btn" disabled>
+                        <i class="fab fa-whatsapp"></i> Realizar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Pedido -->
+    <div class="modal fade" id="orderModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-clipboard-list"></i> Información del Pedido
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Información importante:</strong> Te contactaremos por WhatsApp para confirmar tu pedido y coordinar la entrega.
+                    </div>
+                    
+                    <form id="order-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cliente_nombre" class="form-label">
+                                        <i class="fas fa-user"></i> Nombre Completo *
+                                    </label>
+                                    <input type="text" class="form-control" id="cliente_nombre" required 
+                                           placeholder="Ej: Juan Pérez">
+                                    <div class="form-text">Tu nombre completo para la entrega</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cliente_telefono" class="form-label">
+                                        <i class="fab fa-whatsapp"></i> WhatsApp *
+                                    </label>
+                                    <input type="tel" class="form-control" id="cliente_telefono" required 
+                                           placeholder="Ej: +51 987 654 321">
+                                    <div class="form-text">Número con código de país</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="cliente_direccion" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Dirección de Entrega *
+                            </label>
+                            <textarea class="form-control" id="cliente_direccion" rows="3" required
+                                      placeholder="Ej: Av. Principal 123, Distrito, Ciudad"></textarea>
+                            <div class="form-text">Dirección completa para la entrega</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="cliente_comentarios" class="form-label">
+                                <i class="fas fa-comment"></i> Comentarios Adicionales
+                            </label>
+                            <textarea class="form-control" id="cliente_comentarios" rows="2"
+                                      placeholder="Instrucciones especiales, referencias, etc."></textarea>
+                            <div class="form-text">Opcional: Instrucciones para la entrega</div>
+                        </div>
+                        
+                        <!-- Resumen del pedido -->
+                        <div class="card bg-light">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-shopping-cart"></i> Resumen del Pedido
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="order-summary">
+                                    <!-- Se llenará dinámicamente -->
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <strong>Total:</strong>
+                                    <strong id="order-total">$0.00</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-whatsapp text-white" id="confirm-order-btn">
+                        <i class="fab fa-whatsapp"></i> Confirmar Pedido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Carrito de compras
+        let cart = [];
+        
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            if (cart.length === 0) {
+            cartItems.innerHTML = '<p class="text-muted">Tu carrito está vacío</p>';
+            cartCount.textContent = '0';
+            cartTotal.textContent = '$0.00';
+            checkoutBtn.disabled = true;
+            
+            // Deshabilitar botón de limpiar carrito
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            if (clearCartBtn) {
+                clearCartBtn.disabled = true;
+            }
+                return;
+            }
+            
+            let total = 0;
+            let html = '';
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.precio * item.cantidad;
+                total += itemTotal;
+                
+                html += `
+                    <div class="cart-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${item.nombre}</h6>
+                                <small class="text-muted">$${item.precio.toFixed(2)} c/u</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
+                                <span class="mx-2">${item.cantidad}</span>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, 1)">+</button>
+                                <button class="btn btn-sm btn-outline-danger ms-2" onclick="removeFromCart(${index})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <strong>$${itemTotal.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            cartItems.innerHTML = html;
+            cartCount.textContent = cart.length;
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+            checkoutBtn.disabled = false;
+            
+            // Habilitar botón de limpiar carrito
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            if (clearCartBtn) {
+                clearCartBtn.disabled = false;
+            }
+        }
+        
+        function addToCart(id, nombre, precio, stock) {
+            console.log('Agregando al carrito:', { id, nombre, precio, stock });
+            
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                if (existingItem.cantidad < stock) {
+                    existingItem.cantidad += 1;
+                } else {
+                    alert('No hay suficiente stock disponible');
+                    return;
+                }
+            } else {
+                cart.push({
+                    id: id,
+                    nombre: nombre,
+                    precio: precio,
+                    cantidad: 1
+                });
+            }
+            
+            updateCartDisplay();
+            
+            // Actualizar el stock mostrado en la página
+            updateProductStockDisplay(id, stock - (existingItem ? existingItem.cantidad : 0));
+            
+            // Mostrar mensaje de confirmación
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <span>${nombre} agregado al carrito</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+        
+        function updateQuantity(index, change) {
+            const item = cart[index];
+            
+            if (change > 0) {
+                // Verificar stock disponible antes de aumentar
+                fetch(`/api/producto/${item.id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.producto.stock > item.cantidad) {
+                            item.cantidad += change;
+                            updateCartDisplay();
+                        } else {
+                            alert(`No hay suficiente stock disponible. Stock actual: ${data.producto ? data.producto.stock : 0}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al verificar stock:', error);
+                        alert('Error al verificar el stock disponible');
+                    });
+            } else {
+                // Disminuir cantidad (no necesita validación)
+                item.cantidad += change;
+                
+                if (item.cantidad <= 0) {
+                    cart.splice(index, 1);
+                }
+                
+                updateCartDisplay();
+            }
+        }
+        
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartDisplay();
+        }
+        
+        function updateProductStockDisplay(productId, newStock) {
+            // Buscar el botón del producto y actualizar el stock mostrado
+            const buttons = document.querySelectorAll(`button[onclick*="addToCart(${productId}"]`);
+            buttons.forEach(button => {
+                const card = button.closest('.card');
+                if (card) {
+                    const stockElement = card.querySelector('.text-success, .text-danger');
+                    if (stockElement) {
+                        if (newStock > 0) {
+                            stockElement.className = 'text-success';
+                            stockElement.innerHTML = '<i class="fas fa-check-circle"></i> Disponible';
+                            button.disabled = false;
+                            button.className = 'btn btn-primary w-100';
+                            button.innerHTML = '<i class="fas fa-cart-plus"></i> Agregar al Carrito';
+                        } else {
+                            stockElement.className = 'text-danger';
+                            stockElement.innerHTML = '<i class="fas fa-times-circle"></i> Sin stock';
+                            button.disabled = true;
+                            button.className = 'btn btn-secondary w-100';
+                            button.innerHTML = '<i class="fas fa-ban"></i> Sin Stock';
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Manejo del pedido
+        document.getElementById('checkout-btn').addEventListener('click', function() {
+            if (cart.length === 0) return;
+            
+            // Actualizar resumen del pedido
+            updateOrderSummary();
+            
+            const orderModal = new bootstrap.Modal(document.getElementById('orderModal'));
+            orderModal.show();
+        });
+        
+        // Limpiar carrito
+        document.getElementById('clear-cart-btn').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que quieres limpiar el carrito?')) {
+                cart = [];
+                updateCartDisplay();
+            }
+        });
+        
+        function updateOrderSummary() {
+            const orderSummary = document.getElementById('order-summary');
+            const orderTotal = document.getElementById('order-total');
+            
+            let html = '';
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.precio * item.cantidad;
+                total += itemTotal;
+                
+                html += `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <span class="fw-bold">${item.nombre}</span>
+                            <small class="text-muted d-block">$${item.precio.toFixed(2)} c/u</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-primary">${item.cantidad}</span>
+                            <div class="fw-bold">$${itemTotal.toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            orderSummary.innerHTML = html;
+            orderTotal.textContent = `$${total.toFixed(2)}`;
+        }
+        
+        document.getElementById('confirm-order-btn').addEventListener('click', function() {
+            // Validaciones
+            const nombre = document.getElementById('cliente_nombre').value.trim();
+            const telefono = document.getElementById('cliente_telefono').value.trim();
+            const direccion = document.getElementById('cliente_direccion').value.trim();
+            const comentarios = document.getElementById('cliente_comentarios').value.trim();
+            
+            if (!nombre) {
+                alert('Por favor, ingresa tu nombre completo');
+                document.getElementById('cliente_nombre').focus();
+                return;
+            }
+            
+            if (!telefono) {
+                alert('Por favor, ingresa tu número de WhatsApp');
+                document.getElementById('cliente_telefono').focus();
+                return;
+            }
+            
+            // Validar formato de teléfono (básico)
+            const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
+            if (!phoneRegex.test(telefono)) {
+                alert('Por favor, ingresa un número de teléfono válido (ej: +51 987 654 321)');
+                document.getElementById('cliente_telefono').focus();
+                return;
+            }
+            
+            if (!direccion) {
+                alert('Por favor, ingresa tu dirección de entrega');
+                document.getElementById('cliente_direccion').focus();
+                return;
+            }
+            
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            const btn = document.getElementById('confirm-order-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            btn.disabled = true;
+            
+            const orderData = {
+                cliente_nombre: nombre,
+                cliente_telefono: telefono,
+                cliente_direccion: direccion,
+                cliente_comentarios: comentarios,
+                items: cart.map(item => ({
+                    producto_id: item.id,
+                    cantidad: item.cantidad
+                })),
+                total: cart.reduce((sum, item) => sum + (item.precio * item.cantidad), 0)
+            };
+            
+            fetch('/api/pedido', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mensaje de éxito más detallado
+                    const successMessage = `¡Pedido realizado exitosamente!
+
+📋 Número de pedido: #${data.pedido_id}
+💰 Total: $${orderData.total.toFixed(2)}
+📱 Te contactaremos por WhatsApp: ${telefono}
+
+¡Gracias por tu compra!`;
+                    
+                    alert(successMessage);
+                    
+                    // Limpiar carrito y formulario
+                    cart = [];
+                    updateCartDisplay();
+                    document.getElementById('order-form').reset();
+                    
+                    // Cerrar modales
+                    bootstrap.Modal.getInstance(document.getElementById('orderModal')).hide();
+                    bootstrap.Modal.getInstance(document.getElementById('cartModal')).hide();
+                    
+                } else {
+                    alert('Error al realizar el pedido: ' + data.error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al realizar el pedido. Por favor, intenta nuevamente.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        });
+    </script>
+    
+    <!-- Cargar nombre de la tienda dinámicamente -->
+    <script>
+        // Cargar configuración de la tienda al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarNombreTienda();
+        });
+        
+        function cargarNombreTienda() {
+            fetch('/api/configuracion/publica')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.configuracion.nombre_tienda) {
+                        document.getElementById('nombre-tienda').textContent = data.configuracion.nombre_tienda;
+                        document.title = data.configuracion.nombre_tienda;
+                    }
+                })
+                .catch(error => {
+                    console.log('Usando nombre por defecto de la tienda');
+                });
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+    
+    <!-- Botón de WhatsApp Flotante -->
+    <div id="whatsapp-float-btn" class="whatsapp-float" style="display: none;">
+        <a href="#" id="whatsapp-link" target="_blank" title="Contactar por WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+    
+    <style>
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .whatsapp-float:hover {
+            background-color: #128c7e;
+            transform: scale(1.1);
+        }
+        
+        .whatsapp-float a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        .whatsapp-float i {
+            line-height: 60px;
+        }
+        
+        @media (max-width: 768px) {
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 15px;
+                font-size: 25px;
+            }
+            
+            .whatsapp-float i {
+                line-height: 50px;
+            }
+        }
+    </style>
+    
+    <script>
+        // Cargar y mostrar botón de WhatsApp
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarWhatsAppAdmin();
+        });
+        
+        function cargarWhatsAppAdmin() {
+            fetch('/api/configuracion/publica')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.configuracion.whatsapp_admin) {
+                        const whatsappNumber = data.configuracion.whatsapp_admin;
+                        const whatsappBtn = document.getElementById('whatsapp-float-btn');
+                        const whatsappLink = document.getElementById('whatsapp-link');
+                        
+                        // Limpiar el número (quitar espacios, guiones, etc.)
+                        const cleanNumber = whatsappNumber.replace(/[^\d+]/g, '');
+                        
+                        // Crear enlace de WhatsApp
+                        whatsappLink.href = `https://wa.me/${cleanNumber}?text=Hola! Me interesa hacer un pedido.`;
+                        
+                        // Mostrar el botón
+                        whatsappBtn.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.log('No se pudo cargar el WhatsApp del administrador');
+                });
+        }
+    </script>
+</body>
+</html>
