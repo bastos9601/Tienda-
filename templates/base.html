@@ -106,6 +106,64 @@
             border-bottom-right-radius: 0.375rem;
         }
         
+        /* Estilos para términos y condiciones */
+        .terms-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .terms-content h6 {
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .terms-content h6:first-child {
+            margin-top: 0;
+        }
+        
+        .terms-content ul {
+            margin-bottom: 1rem;
+            padding-left: 1.2rem;
+        }
+        
+        .terms-content li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #25D366;
+            border-color: #25D366;
+        }
+        
+        .form-check-input:focus {
+            border-color: #25D366;
+            box-shadow: 0 0 0 0.2rem rgba(37, 211, 102, 0.25);
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .form-check-label i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Estilos para botón deshabilitado */
+        #confirm-order-btn:disabled {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        #confirm-order-btn:disabled:hover {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            transform: none;
+        }
+        
         .badge {
             font-size: 0.75em;
         }
@@ -274,6 +332,68 @@
                             <div class="form-text">Opcional: Instrucciones para la entrega</div>
                         </div>
                         
+                        <!-- Términos y Condiciones -->
+                        <div class="mb-4">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-file-contract"></i> Términos y Condiciones
+                                    </h6>
+                                </div>
+                                <div class="card-body" style="max-height: 200px; overflow-y: auto;">
+                                    <div class="terms-content">
+                                        <h6 class="text-primary">1. Información del Pedido</h6>
+                                        <ul class="small">
+                                            <li>Los precios mostrados son finales e incluyen todos los impuestos aplicables.</li>
+                                            <li>La disponibilidad de productos está sujeta al stock disponible al momento del pedido.</li>
+                                            <li>Nos reservamos el derecho de modificar precios sin previo aviso.</li>
+                                        </ul>
+                                        
+                                        <h6 class="text-primary">2. Proceso de Pedido</h6>
+                                        <ul class="small">
+                                            <li>Al confirmar tu pedido, recibirás un mensaje de WhatsApp para validar los detalles.</li>
+                                            <li>El pedido se procesará una vez confirmado por WhatsApp.</li>
+                                            <li>Te contactaremos para coordinar la entrega y confirmar disponibilidad.</li>
+                                        </ul>
+                                        
+                                        <h6 class="text-primary">3. Entrega</h6>
+                                        <ul class="small">
+                                            <li>Los tiempos de entrega son estimados y pueden variar según la ubicación.</li>
+                                            <li>Es responsabilidad del cliente proporcionar una dirección de entrega correcta y completa.</li>
+                                            <li>Si no hay nadie en la dirección, se coordinará una nueva entrega.</li>
+                                        </ul>
+                                        
+                                        <h6 class="text-primary">4. Pagos</h6>
+                                        <ul class="small">
+                                            <li>El pago se realiza al momento de la entrega (efectivo o transferencia).</li>
+                                            <li>No se aceptan devoluciones una vez entregado el producto.</li>
+                                            <li>En caso de productos defectuosos, se evaluará caso por caso.</li>
+                                        </ul>
+                                        
+                                        <h6 class="text-primary">5. Privacidad</h6>
+                                        <ul class="small">
+                                            <li>Tu información personal será utilizada únicamente para procesar tu pedido.</li>
+                                            <li>No compartimos tu información con terceros sin tu consentimiento.</li>
+                                            <li>Podemos contactarte por WhatsApp para confirmar pedidos y entregas.</li>
+                                        </ul>
+                                        
+                                        <p class="small text-muted mt-3">
+                                            <strong>Al confirmar tu pedido, aceptas estos términos y condiciones.</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" id="acepto_terminos" required>
+                                <label class="form-check-label" for="acepto_terminos">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>Acepto los términos y condiciones</strong> *
+                                </label>
+                                <div class="form-text">Debes aceptar los términos para continuar con tu pedido</div>
+                            </div>
+                        </div>
+                        
                         <!-- Resumen del pedido -->
                         <div class="card bg-light">
                             <div class="card-header">
@@ -296,7 +416,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-whatsapp text-white" id="confirm-order-btn">
+                    <button type="button" class="btn btn-whatsapp text-white" id="confirm-order-btn" disabled>
                         <i class="fab fa-whatsapp"></i> Confirmar Pedido
                     </button>
                 </div>
@@ -308,6 +428,24 @@
     <script>
         // Carrito de compras
         let cart = [];
+        
+        // Función para habilitar/deshabilitar botón de confirmar pedido
+        function toggleConfirmButton() {
+            const aceptoTerminos = document.getElementById('acepto_terminos');
+            const confirmBtn = document.getElementById('confirm-order-btn');
+            
+            if (aceptoTerminos && confirmBtn) {
+                if (aceptoTerminos.checked) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.classList.remove('btn-secondary');
+                    confirmBtn.classList.add('btn-whatsapp');
+                } else {
+                    confirmBtn.disabled = true;
+                    confirmBtn.classList.remove('btn-whatsapp');
+                    confirmBtn.classList.add('btn-secondary');
+                }
+            }
+        }
         
         function updateCartDisplay() {
             const cartItems = document.getElementById('cart-items');
@@ -536,6 +674,7 @@
             const telefono = document.getElementById('cliente_telefono').value.trim();
             const direccion = document.getElementById('cliente_direccion').value.trim();
             const comentarios = document.getElementById('cliente_comentarios').value.trim();
+            const aceptoTerminos = document.getElementById('acepto_terminos').checked;
             
             if (!nombre) {
                 alert('Por favor, ingresa tu nombre completo');
@@ -560,6 +699,12 @@
             if (!direccion) {
                 alert('Por favor, ingresa tu dirección de entrega');
                 document.getElementById('cliente_direccion').focus();
+                return;
+            }
+            
+            if (!aceptoTerminos) {
+                alert('Debes aceptar los términos y condiciones para continuar con tu pedido');
+                document.getElementById('acepto_terminos').focus();
                 return;
             }
             
@@ -636,6 +781,12 @@
         // Cargar configuración de la tienda al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             cargarNombreTienda();
+            
+            // Event listener para el checkbox de términos y condiciones
+            const aceptoTerminos = document.getElementById('acepto_terminos');
+            if (aceptoTerminos) {
+                aceptoTerminos.addEventListener('change', toggleConfirmButton);
+            }
         });
         
         function cargarNombreTienda() {

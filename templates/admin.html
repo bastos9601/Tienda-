@@ -3,80 +3,134 @@
 {% block title %}Administración - Mi Tienda Online{% endblock %}
 
 {% block content %}
+<!-- Header responsivo -->
 <div class="row">
     <div class="col-12">
-        <h1 class="mb-4">
-            <i class="fas fa-cogs"></i> Panel de Administración
-        </h1>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+            <h1 class="mb-2 mb-md-0">
+                <i class="fas fa-cogs"></i> 
+                <span class="d-none d-sm-inline">Panel de Administración</span>
+                <span class="d-inline d-sm-none">Admin</span>
+            </h1>
+            
+            <!-- Botón de menú móvil -->
+            <button class="btn btn-outline-primary d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu" aria-expanded="false">
+                <i class="fas fa-bars"></i> Menú
+            </button>
+        </div>
     </div>
 </div>
 
-<!-- Tabs de navegación -->
-<ul class="nav nav-tabs" id="adminTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos" type="button" role="tab">
-            <i class="fas fa-box"></i> Productos
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pedidos-tab" data-bs-toggle="tab" data-bs-target="#pedidos" type="button" role="tab">
-            <i class="fas fa-shopping-cart"></i> Pedidos
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias" type="button" role="tab">
-            <i class="fas fa-tags"></i> Categorías
-        </button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="configuracion-tab" data-bs-toggle="tab" data-bs-target="#configuracion" type="button" role="tab">
-            <i class="fas fa-cog"></i> Configuración
-        </button>
-    </li>
-</ul>
-
-<!-- Barra de notificaciones y controles -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <!-- Notificaciones de pedidos -->
-    <div class="notifications-container">
-        <div class="alert alert-warning d-none" id="pedidosAlert" role="alert">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-bell me-2"></i>
-                <div>
-                    <strong id="pedidosCount">0</strong> pedidos pendientes
-                    <small class="d-block text-muted" id="ultimoPedidoInfo"></small>
+<!-- Navegación responsiva -->
+<div class="row">
+    <div class="col-12">
+        <!-- Tabs de escritorio -->
+        <ul class="nav nav-tabs d-none d-md-flex" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos" type="button" role="tab">
+                    <i class="fas fa-box"></i> <span class="d-none d-lg-inline">Productos</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pedidos-tab" data-bs-toggle="tab" data-bs-target="#pedidos" type="button" role="tab">
+                    <i class="fas fa-shopping-cart"></i> <span class="d-none d-lg-inline">Pedidos</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias" type="button" role="tab">
+                    <i class="fas fa-tags"></i> <span class="d-none d-lg-inline">Categorías</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="configuracion-tab" data-bs-toggle="tab" data-bs-target="#configuracion" type="button" role="tab">
+                    <i class="fas fa-cog"></i> <span class="d-none d-lg-inline">Configuración</span>
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Menú móvil colapsable -->
+        <div class="collapse d-md-none mb-3" id="mobileMenu">
+            <div class="card">
+                <div class="card-body p-2">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary text-start" id="productos-tab-mobile" data-bs-toggle="tab" data-bs-target="#productos" type="button" role="tab">
+                            <i class="fas fa-box me-2"></i> Productos
+                        </button>
+                        <button class="btn btn-outline-primary text-start position-relative" id="pedidos-tab-mobile" data-bs-toggle="tab" data-bs-target="#pedidos" type="button" role="tab">
+                            <i class="fas fa-shopping-cart me-2"></i> Pedidos
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="pedidosBadgeMobile">
+                                0
+                            </span>
+                        </button>
+                        <button class="btn btn-outline-primary text-start" id="categorias-tab-mobile" data-bs-toggle="tab" data-bs-target="#categorias" type="button" role="tab">
+                            <i class="fas fa-tags me-2"></i> Categorías
+                        </button>
+                        <button class="btn btn-outline-primary text-start" id="configuracion-tab-mobile" data-bs-toggle="tab" data-bs-target="#configuracion" type="button" role="tab">
+                            <i class="fas fa-cog me-2"></i> Configuración
+                        </button>
+                    </div>
                 </div>
-                <button type="button" class="btn-close ms-auto" onclick="ocultarNotificacion()"></button>
             </div>
         </div>
     </div>
-    
-    <!-- Controles del panel -->
-    <div class="d-flex align-items-center gap-2">
-        <!-- Contador de notificaciones en el botón de pedidos -->
-        <div class="position-relative">
-            <button class="btn btn-outline-primary" id="pedidos-tab-btn" onclick="cambiarTab('pedidos')" title="Ver pedidos">
-                <i class="fas fa-shopping-cart"></i> Pedidos
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="pedidosBadge">
-                    0
-                </span>
-            </button>
+</div>
+
+<!-- Barra de notificaciones y controles responsiva -->
+<div class="row mb-3">
+    <div class="col-12">
+        <!-- Notificaciones de pedidos -->
+        <div class="notifications-container mb-3">
+            <div class="alert alert-warning d-none" id="pedidosAlert" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-bell me-2"></i>
+                    <div class="flex-grow-1">
+                        <strong id="pedidosCount">0</strong> pedidos pendientes
+                        <small class="d-block text-muted" id="ultimoPedidoInfo"></small>
+                    </div>
+                    <button type="button" class="btn-close" onclick="ocultarNotificacion()"></button>
+                </div>
+            </div>
         </div>
         
-        <!-- Botón de actualizar -->
-        <button class="btn btn-outline-primary" id="actualizarPanelBtn" title="Actualizar panel del administrador">
-            <i class="fas fa-sync-alt"></i> Actualizar Panel
-        </button>
-        
-        <!-- Botón de notificaciones -->
-        <button class="btn btn-outline-info" id="toggleNotificationsBtn" title="Activar/Desactivar notificaciones">
-            <i class="fas fa-bell" id="notificationIcon"></i>
-        </button>
-        
-        <!-- Botón para probar sonido -->
-        <button class="btn btn-outline-success" id="testSoundBtn" title="Probar sonido de notificación">
-            <i class="fas fa-volume-up"></i>
-        </button>
+        <!-- Controles del panel responsivos -->
+        <div class="row g-2">
+            <!-- Controles principales -->
+            <div class="col-12 col-sm-6 col-md-8">
+                <div class="d-flex flex-wrap gap-2">
+                    <!-- Botón de pedidos (solo en escritorio) -->
+                    <div class="position-relative d-none d-md-block">
+                        <button class="btn btn-outline-primary" id="pedidos-tab-btn" onclick="cambiarTab('pedidos')" title="Ver pedidos">
+                            <i class="fas fa-shopping-cart"></i> <span class="d-none d-lg-inline">Pedidos</span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="pedidosBadge">
+                                0
+                            </span>
+                        </button>
+                    </div>
+                    
+                    <!-- Botón de actualizar -->
+                    <button class="btn btn-outline-primary" id="actualizarPanelBtn" title="Actualizar panel del administrador">
+                        <i class="fas fa-sync-alt"></i> <span class="d-none d-sm-inline">Actualizar</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Controles de notificaciones -->
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="d-flex flex-wrap gap-2 justify-content-sm-end">
+                    <!-- Botón de notificaciones -->
+                    <button class="btn btn-outline-info" id="toggleNotificationsBtn" title="Activar/Desactivar notificaciones">
+                        <i class="fas fa-bell" id="notificationIcon"></i>
+                        <span class="d-none d-sm-inline ms-1">Notif.</span>
+                    </button>
+                    
+                    <!-- Botón para probar sonido -->
+                    <button class="btn btn-outline-success" id="testSoundBtn" title="Probar sonido de notificación">
+                        <i class="fas fa-volume-up"></i>
+                        <span class="d-none d-sm-inline ms-1">Sonido</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -85,42 +139,56 @@
     <div class="tab-pane fade show active" id="productos" role="tabpanel">
         <div class="row mt-4">
             <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3>Gestión de Productos</h3>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
-                        <i class="fas fa-plus"></i> Nuevo Producto
+                <!-- Header responsivo -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3">
+                    <h3 class="mb-2 mb-sm-0">
+                        <i class="fas fa-box"></i> 
+                        <span class="d-none d-sm-inline">Gestión de Productos</span>
+                        <span class="d-inline d-sm-none">Productos</span>
+                    </h3>
+                    <button class="btn btn-primary w-100 w-sm-auto" data-bs-toggle="modal" data-bs-target="#productoModal">
+                        <i class="fas fa-plus"></i> 
+                        <span class="d-none d-sm-inline">Nuevo Producto</span>
+                        <span class="d-inline d-sm-none">Nuevo</span>
                     </button>
                 </div>
                 
-                <div class="row">
+                <!-- Grid responsivo de productos -->
+                <div class="row g-3">
                     {% for producto in productos %}
-                    <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                         <div class="card h-100 shadow-sm">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">
-                                    <i class="fas fa-box text-primary"></i> {{ producto.nombre }}
+                                <h6 class="mb-0 text-truncate" title="{{ producto.nombre }}">
+                                    <i class="fas fa-box text-primary"></i> 
+                                    <span class="d-none d-sm-inline">{{ producto.nombre }}</span>
+                                    <span class="d-inline d-sm-none">{{ producto.nombre[:15] }}{% if producto.nombre|length > 15 %}...{% endif %}</span>
                                 </h6>
                                 <span class="badge bg-secondary">#{{ producto.id }}</span>
                             </div>
                             <div class="card-body">
-                                <div class="row mb-3">
+                                <!-- Información del producto -->
+                                <div class="row g-2 mb-3">
                                     <div class="col-6">
-                                        <small class="text-muted">Precio</small>
+                                        <small class="text-muted d-block">Precio</small>
                                         <div class="fw-bold text-success">${{ "%.2f"|format(producto.precio) }}</div>
                                     </div>
                                     <div class="col-6">
-                                        <small class="text-muted">Stock</small>
+                                        <small class="text-muted d-block">Stock</small>
                                         <div class="fw-bold text-info">{{ producto.stock }}</div>
                                     </div>
                                 </div>
                                 
                                 {% if producto.descripcion %}
                                 <div class="mb-3">
-                                    <small class="text-muted">Descripción</small>
-                                    <div class="small">{{ producto.descripcion[:50] }}{% if producto.descripcion|length > 50 %}...{% endif %}</div>
+                                    <small class="text-muted d-block">Descripción</small>
+                                    <div class="small text-truncate" title="{{ producto.descripcion }}">
+                                        {{ producto.descripcion[:40] }}{% if producto.descripcion|length > 40 %}...{% endif %}
+                                    </div>
                                 </div>
                                 {% endif %}
                                 
+                                <!-- Estado y controles -->
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
                                         {% if producto.activo %}
@@ -142,13 +210,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer bg-light">
-                                <div class="btn-group w-100" role="group">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="editarProducto({{ producto.id }}, '{{ producto.nombre|replace("'", "\\'") }}', '{{ producto.descripcion|replace("'", "\\'") if producto.descripcion else "" }}', {{ producto.precio }}, {{ producto.stock }}, '{{ producto.imagen if producto.imagen else "" }}', {{ producto.activo|lower }}, {{ producto.categoria_id if producto.categoria_id else 'null' }})" title="Editar producto">
-                                        <i class="fas fa-edit"></i> Editar
+                            <div class="card-footer bg-light p-2">
+                                <!-- Botones de acción responsivos -->
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editarProducto({{ producto.id }}, '{{ producto.nombre|replace("'", "\\'") }}', '{{ producto.descripcion|replace("'", "\\'") if producto.descripcion else "" }}', {{ producto.precio }}, {{ producto.stock }}, '{{ producto.imagen if producto.imagen else "" }}', {{ producto.activo|lower }}, {{ producto.categoria_id if producto.categoria_id else 'null' }})" title="Editar producto">
+                                        <i class="fas fa-edit"></i> 
+                                        <span class="d-none d-sm-inline ms-1">Editar</span>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarProducto({{ producto.id }})" title="Eliminar producto">
-                                        <i class="fas fa-trash"></i> Eliminar
+                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="eliminarProducto({{ producto.id }})" title="Eliminar producto">
+                                        <i class="fas fa-trash"></i> 
+                                        <span class="d-none d-sm-inline ms-1">Eliminar</span>
                                     </button>
                                 </div>
                             </div>
@@ -164,58 +235,68 @@
     <div class="tab-pane fade" id="pedidos" role="tabpanel">
         <div class="row mt-4">
             <div class="col-12">
-                <h3>Gestión de Pedidos</h3>
+                <h3>
+                    <i class="fas fa-shopping-cart"></i> 
+                    <span class="d-none d-sm-inline">Gestión de Pedidos</span>
+                    <span class="d-inline d-sm-none">Pedidos</span>
+                </h3>
                 
-                <div class="row">
+                <!-- Grid responsivo de pedidos -->
+                <div class="row g-3">
                     {% for pedido in pedidos %}
-                    <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="col-12 col-lg-6 col-xl-4">
                         <div class="card h-100 shadow-sm" data-pedido-id="{{ pedido.id }}">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">
-                                    <i class="fas fa-shopping-cart text-primary"></i> Pedido #{{ pedido.id }}
+                                    <i class="fas fa-shopping-cart text-primary"></i> 
+                                    <span class="d-none d-sm-inline">Pedido #{{ pedido.id }}</span>
+                                    <span class="d-inline d-sm-none">#{{ pedido.id }}</span>
                                 </h6>
                                 <small class="text-muted">{{ pedido.fecha_pedido.strftime('%d/%m/%Y') }}</small>
                             </div>
                             <div class="card-body">
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <small class="text-muted">Cliente</small>
-                                        <div class="fw-bold">{{ pedido.cliente_nombre }}</div>
-                                    </div>
+                                <!-- Información del cliente -->
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Cliente</small>
+                                    <div class="fw-bold text-truncate" title="{{ pedido.cliente_nombre }}">{{ pedido.cliente_nombre }}</div>
                                 </div>
                                 
-                                <div class="row mb-3">
+                                <!-- Teléfono y Total -->
+                                <div class="row g-2 mb-3">
                                     <div class="col-6">
-                                        <small class="text-muted">Teléfono</small>
+                                        <small class="text-muted d-block">Teléfono</small>
                                         <div class="small">{{ pedido.cliente_telefono }}</div>
                                     </div>
                                     <div class="col-6">
-                                        <small class="text-muted">Total</small>
+                                        <small class="text-muted d-block">Total</small>
                                         <div class="fw-bold text-success">${{ "%.2f"|format(pedido.total) }}</div>
                                     </div>
                                 </div>
                                 
+                                <!-- Dirección -->
                                 {% if pedido.cliente_direccion %}
                                 <div class="mb-3">
-                                    <small class="text-muted">Dirección</small>
-                                    <div class="small">{{ pedido.cliente_direccion[:40] }}{% if pedido.cliente_direccion|length > 40 %}...{% endif %}</div>
+                                    <small class="text-muted d-block">Dirección</small>
+                                    <div class="small text-truncate" title="{{ pedido.cliente_direccion }}">
+                                        {{ pedido.cliente_direccion[:35] }}{% if pedido.cliente_direccion|length > 35 %}...{% endif %}
+                                    </div>
                                 </div>
                                 {% endif %}
                                 
+                                <!-- Estado -->
                                 <div class="mb-3">
-                                    <small class="text-muted">Estado</small>
-                                    <div>
-                                        <select class="form-select form-select-sm" onchange="actualizarEstado({{ pedido.id }}, this.value)">
-                                            <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                                            <option value="confirmado" {% if pedido.estado == 'confirmado' %}selected{% endif %}>Confirmado</option>
-                                            <option value="entregado" {% if pedido.estado == 'entregado' %}selected{% endif %}>Entregado</option>
-                                        </select>
-                                    </div>
+                                    <small class="text-muted d-block">Estado</small>
+                                    <select class="form-select form-select-sm" onchange="actualizarEstado({{ pedido.id }}, this.value)">
+                                        <option value="pendiente" {% if pedido.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                                        <option value="confirmado" {% if pedido.estado == 'confirmado' %}selected{% endif %}>Confirmado</option>
+                                        <option value="entregado" {% if pedido.estado == 'entregado' %}selected{% endif %}>Entregado</option>
+                                    </select>
                                 </div>
                                 
+                                <!-- Hora y badge de estado -->
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
-                                        <i class="fas fa-clock"></i> {{ pedido.fecha_pedido.strftime('%H:%M') }}
+                                        <i class="fas fa-clock"></i> {{ pedido.fecha_pedido.strftime('%I:%M %p') }}
                                     </small>
                                     <div>
                                         {% if pedido.estado == 'pendiente' %}
@@ -228,13 +309,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer bg-light">
-                                <div class="btn-group w-100" role="group">
-                                    <button class="btn btn-sm btn-outline-info" onclick="verDetallePedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\'") }}', '{{ pedido.cliente_telefono|replace("'", "\\'") }}', '{{ pedido.cliente_direccion|replace("'", "\\'") }}', {{ pedido.total }}, '{{ pedido.estado }}', '{{ pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M') }}', '{{ pedido.cliente_comentarios|replace("'", "\\'") if pedido.cliente_comentarios else "" }}')" title="Ver detalles del pedido">
-                                        <i class="fas fa-eye"></i> Ver
+                            <div class="card-footer bg-light p-2">
+                                <!-- Botones de acción responsivos -->
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <button class="btn btn-sm btn-outline-info flex-fill" onclick="verDetallePedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\'") }}', '{{ pedido.cliente_telefono|replace("'", "\\'") }}', '{{ pedido.cliente_direccion|replace("'", "\\'") }}', {{ pedido.total }}, '{{ pedido.estado }}', '{{ pedido.fecha_pedido.strftime('%d/%m/%Y %I:%M %p') }}', '{{ pedido.cliente_comentarios|replace("'", "\\'") if pedido.cliente_comentarios else "" }}')" title="Ver detalles del pedido">
+                                        <i class="fas fa-eye"></i> 
+                                        <span class="d-none d-sm-inline ms-1">Ver</span>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarPedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\'") }}')" title="Eliminar pedido">
-                                        <i class="fas fa-trash"></i> Eliminar
+                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="eliminarPedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\'") }}')" title="Eliminar pedido">
+                                        <i class="fas fa-trash"></i> 
+                                        <span class="d-none d-sm-inline ms-1">Eliminar</span>
                                     </button>
                                 </div>
                             </div>
@@ -250,10 +334,17 @@
     <div class="tab-pane fade" id="categorias" role="tabpanel">
         <div class="row mt-4">
             <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3><i class="fas fa-tags"></i> Gestión de Categorías</h3>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoriaModal" onclick="nuevaCategoria()">
-                        <i class="fas fa-plus"></i> Nueva Categoría
+                <!-- Header responsivo -->
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
+                    <h3 class="mb-2 mb-sm-0">
+                        <i class="fas fa-tags"></i> 
+                        <span class="d-none d-sm-inline">Gestión de Categorías</span>
+                        <span class="d-inline d-sm-none">Categorías</span>
+                    </h3>
+                    <button class="btn btn-primary w-100 w-sm-auto" data-bs-toggle="modal" data-bs-target="#categoriaModal" onclick="nuevaCategoria()">
+                        <i class="fas fa-plus"></i> 
+                        <span class="d-none d-sm-inline">Nueva Categoría</span>
+                        <span class="d-inline d-sm-none">Nueva</span>
                     </button>
                 </div>
                 
@@ -275,26 +366,28 @@
                     </div>
                     
                     {% for categoria in categorias %}
-                    <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="col-12 col-sm-6 col-lg-4 mb-4">
                         <div class="card h-100 shadow-sm">
                             <div class="card-header d-flex justify-content-between align-items-center" style="background-color: {{ categoria.color }}20; border-left: 4px solid {{ categoria.color }};">
-                                <h6 class="mb-0">
-                                    <i class="{{ categoria.icono }}" style="color: {{ categoria.color }};"></i> {{ categoria.nombre }}
+                                <h6 class="mb-0 text-truncate" title="{{ categoria.nombre }}">
+                                    <i class="{{ categoria.icono }}" style="color: {{ categoria.color }};"></i> 
+                                    <span class="d-none d-sm-inline">{{ categoria.nombre }}</span>
+                                    <span class="d-inline d-sm-none">{{ categoria.nombre[:15] }}{% if categoria.nombre|length > 15 %}...{% endif %}</span>
                                 </h6>
                                 <span class="badge bg-secondary">#{{ categoria.id }}</span>
                             </div>
                             <div class="card-body">
                                 {% if categoria.descripcion %}
-                                <p class="card-text text-muted">{{ categoria.descripcion }}</p>
+                                <p class="card-text text-muted small">{{ categoria.descripcion[:60] }}{% if categoria.descripcion|length > 60 %}...{% endif %}</p>
                                 {% endif %}
                                 
-                                <div class="row mb-3">
+                                <div class="row g-2 mb-3">
                                     <div class="col-6">
-                                        <small class="text-muted">Productos</small>
+                                        <small class="text-muted d-block">Productos</small>
                                         <div class="fw-bold text-info">{{ categoria.productos|length }}</div>
                                     </div>
                                     <div class="col-6">
-                                        <small class="text-muted">Estado</small>
+                                        <small class="text-muted d-block">Estado</small>
                                         <div>
                                             {% if categoria.activa %}
                                             <span class="badge bg-success">Activa</span>
@@ -306,20 +399,23 @@
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <small class="text-muted">Color</small>
+                                    <small class="text-muted d-block">Color</small>
                                     <div class="d-flex align-items-center">
                                         <div class="color-preview me-2" style="width: 20px; height: 20px; background-color: {{ categoria.color }}; border-radius: 50%;"></div>
                                         <span class="small">{{ categoria.color }}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer bg-light">
-                                <div class="btn-group w-100" role="group">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="editarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\'") }}', '{{ categoria.descripcion|replace("'", "\\'") if categoria.descripcion else "" }}', '{{ categoria.icono }}', '{{ categoria.color }}', {{ categoria.activa|lower }})" title="Editar categoría">
-                                        <i class="fas fa-edit"></i> Editar
+                            <div class="card-footer bg-light p-2">
+                                <!-- Botones de acción responsivos -->
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\'") }}', '{{ categoria.descripcion|replace("'", "\\'") if categoria.descripcion else "" }}', '{{ categoria.icono }}', '{{ categoria.color }}', {{ categoria.activa|lower }})" title="Editar categoría">
+                                        <i class="fas fa-edit"></i> 
+                                        <span class="d-none d-sm-inline ms-1">Editar</span>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\'") }}')" title="Eliminar categoría">
-                                        <i class="fas fa-trash"></i> Eliminar
+                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="eliminarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\'") }}')" title="Eliminar categoría">
+                                        <i class="fas fa-trash"></i> 
+                                        <span class="d-none d-sm-inline ms-1">Eliminar</span>
                                     </button>
                                 </div>
                             </div>
@@ -546,11 +642,13 @@
 
 <!-- Modal para Producto -->
 <div class="modal fade" id="productoModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="productoModalTitle">
-                    <i class="fas fa-box"></i> Nuevo Producto
+                    <i class="fas fa-box"></i> 
+                    <span class="d-none d-sm-inline">Nuevo Producto</span>
+                    <span class="d-inline d-sm-none">Producto</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -565,13 +663,19 @@
                         <label for="producto_descripcion" class="form-label">Descripción</label>
                         <textarea class="form-control" id="producto_descripcion" rows="3"></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="producto_precio" class="form-label">Precio *</label>
-                        <input type="number" class="form-control" id="producto_precio" step="0.01" min="0" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="producto_stock" class="form-label">Stock</label>
-                        <input type="number" class="form-control" id="producto_stock" min="0" value="0">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <label for="producto_precio" class="form-label">Precio *</label>
+                                <input type="number" class="form-control" id="producto_precio" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <label for="producto_stock" class="form-label">Stock</label>
+                                <input type="number" class="form-control" id="producto_stock" min="0" value="0">
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="producto_imagen" class="form-label">URL de Imagen</label>
@@ -600,9 +704,13 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times d-sm-none"></i>
+                    <span class="d-none d-sm-inline">Cancelar</span>
+                </button>
                 <button type="button" class="btn btn-primary" id="guardarProductoBtn">
-                    <i class="fas fa-save"></i> Guardar
+                    <i class="fas fa-save"></i> 
+                    <span class="d-none d-sm-inline ms-1">Guardar</span>
                 </button>
             </div>
         </div>
@@ -611,11 +719,13 @@
 
 <!-- Modal para Categoría -->
 <div class="modal fade" id="categoriaModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="categoriaModalTitle">
-                    <i class="fas fa-tag"></i> Nueva Categoría
+                    <i class="fas fa-tag"></i> 
+                    <span class="d-none d-sm-inline">Nueva Categoría</span>
+                    <span class="d-inline d-sm-none">Categoría</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -639,8 +749,8 @@
                         <div class="form-text">Descripción opcional de la categoría</div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6">
                             <div class="mb-3">
                                 <label for="categoria_icono" class="form-label">
                                     <i class="fas fa-icons"></i> Icono
@@ -659,7 +769,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-12 col-sm-6">
                             <div class="mb-3">
                                 <label for="categoria_color" class="form-label">
                                     <i class="fas fa-palette"></i> Color
@@ -697,10 +807,13 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancelar
+                    <i class="fas fa-times d-sm-none"></i>
+                    <span class="d-none d-sm-inline">Cancelar</span>
                 </button>
                 <button type="button" class="btn btn-primary" id="guardarCategoriaBtn">
-                    <i class="fas fa-save"></i> Guardar Categoría
+                    <i class="fas fa-save"></i> 
+                    <span class="d-none d-sm-inline ms-1">Guardar Categoría</span>
+                    <span class="d-inline d-sm-none">Guardar</span>
                 </button>
             </div>
         </div>
@@ -709,11 +822,13 @@
 
 <!-- Modal para Detalle de Pedido -->
 <div class="modal fade" id="detallePedidoModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fas fa-receipt"></i> Detalle del Pedido
+                    <i class="fas fa-receipt"></i> 
+                    <span class="d-none d-sm-inline">Detalle del Pedido</span>
+                    <span class="d-inline d-sm-none">Pedido</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -721,14 +836,142 @@
                 <!-- Contenido dinámico -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="confirmarPedidoBtn" onclick="abrirWhatsAppCliente()">
-                    <i class="fab fa-whatsapp"></i> Enviar WhatsApp al Cliente
+                <button type="button" class="btn btn-success flex-fill flex-md-fill-0" id="confirmarPedidoBtn" onclick="abrirWhatsAppCliente()">
+                    <i class="fab fa-whatsapp"></i> 
+                    <span class="d-none d-sm-inline ms-1">Enviar WhatsApp al Cliente</span>
+                    <span class="d-inline d-sm-none">WhatsApp</span>
                 </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary flex-fill flex-md-fill-0" data-bs-dismiss="modal">
+                    <i class="fas fa-times d-sm-none"></i>
+                    <span class="d-none d-sm-inline">Cerrar</span>
+                </button>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Estilos responsivos adicionales */
+    @media (max-width: 767.98px) {
+        /* Mejorar espaciado en móviles */
+        .container-fluid {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
+        /* Ajustar cards para móviles */
+        .card {
+            margin-bottom: 1rem;
+        }
+        
+        /* Mejorar botones en móviles */
+        .btn {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Mejorar formularios en móviles */
+        .form-control, .form-select {
+            min-height: 44px;
+            font-size: 16px; /* Evita zoom en iOS */
+        }
+        
+        /* Ajustar modales en móviles */
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+        
+        /* Mejorar navegación móvil */
+        .nav-tabs {
+            border-bottom: none;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Ajustar badges en móviles */
+        .badge {
+            font-size: 0.75em;
+        }
+        
+        /* Mejorar alertas en móviles */
+        .alert {
+            font-size: 0.9rem;
+        }
+        
+        /* Ajustar tablas en móviles */
+        .table-responsive {
+            border-radius: 0.375rem;
+        }
+        
+        /* Mejorar espaciado de grid */
+        .row.g-3 {
+            --bs-gutter-x: 1rem;
+            --bs-gutter-y: 1rem;
+        }
+    }
+    
+    @media (max-width: 575.98px) {
+        /* Ajustes para pantallas muy pequeñas */
+        .card-header h6 {
+            font-size: 0.9rem;
+        }
+        
+        .card-body {
+            padding: 0.75rem;
+        }
+        
+        .card-footer {
+            padding: 0.5rem;
+        }
+        
+        /* Botones de acción en una columna */
+        .d-grid.gap-2.d-md-flex {
+            display: grid !important;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        
+        /* Ajustar texto en móviles */
+        .text-truncate {
+            max-width: 120px;
+        }
+    }
+    
+    /* Mejorar experiencia táctil */
+    .btn:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Animaciones suaves */
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Mejorar contraste en móviles */
+    @media (max-width: 767.98px) {
+        .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .btn-outline-primary {
+            border-width: 2px;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
@@ -1786,6 +2029,63 @@
         });
     }
     
+    // ===== SISTEMA RESPONSIVO =====
+    
+    // Sincronizar tabs móviles y de escritorio
+    function sincronizarTabs() {
+        // Event listeners para tabs de escritorio
+        document.querySelectorAll('#adminTabs .nav-link').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function(e) {
+                const targetId = e.target.getAttribute('data-bs-target');
+                // Activar el tab móvil correspondiente
+                const mobileTab = document.querySelector(`#${e.target.id}-mobile`);
+                if (mobileTab) {
+                    mobileTab.classList.add('active');
+                    // Remover active de otros tabs móviles
+                    document.querySelectorAll('#mobileMenu .btn').forEach(btn => {
+                        if (btn !== mobileTab) btn.classList.remove('active');
+                    });
+                }
+            });
+        });
+        
+        // Event listeners para tabs móviles
+        document.querySelectorAll('#mobileMenu .btn').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                const targetId = e.target.getAttribute('data-bs-target');
+                // Activar el tab de escritorio correspondiente
+                const desktopTab = document.querySelector(`#${e.target.id.replace('-mobile', '')}`);
+                if (desktopTab) {
+                    desktopTab.click();
+                }
+                // Cerrar menú móvil después de seleccionar
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu) {
+                    const bsCollapse = new bootstrap.Collapse(mobileMenu, {toggle: false});
+                    bsCollapse.hide();
+                }
+            });
+        });
+    }
+    
+    // Mejorar experiencia táctil
+    function mejorarExperienciaTactil() {
+        // Aumentar área de toque para botones pequeños
+        document.querySelectorAll('.btn-sm').forEach(btn => {
+            btn.style.minHeight = '44px'; // Tamaño mínimo recomendado para touch
+        });
+        
+        // Mejorar selectores
+        document.querySelectorAll('.form-select').forEach(select => {
+            select.style.minHeight = '44px';
+        });
+        
+        // Mejorar inputs
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.style.minHeight = '44px';
+        });
+    }
+    
     // ===== SISTEMA DE NOTIFICACIONES =====
     
     let notificacionesActivas = true;
@@ -1873,12 +2173,23 @@
                     const pedidosCount = document.getElementById('pedidosCount');
                     const ultimoPedidoInfo = document.getElementById('ultimoPedidoInfo');
                     
-                    // Actualizar badge del botón de pedidos
+                    // Actualizar badge del botón de pedidos (escritorio)
                     if (totalPendientes > 0) {
                         pedidosBadge.textContent = totalPendientes;
                         pedidosBadge.classList.remove('d-none');
                     } else {
                         pedidosBadge.classList.add('d-none');
+                    }
+                    
+                    // Actualizar badge del botón de pedidos (móvil)
+                    const pedidosBadgeMobile = document.getElementById('pedidosBadgeMobile');
+                    if (pedidosBadgeMobile) {
+                        if (totalPendientes > 0) {
+                            pedidosBadgeMobile.textContent = totalPendientes;
+                            pedidosBadgeMobile.classList.remove('d-none');
+                        } else {
+                            pedidosBadgeMobile.classList.add('d-none');
+                        }
                     }
                     
                     // Mostrar alerta si hay pedidos pendientes
@@ -1888,9 +2199,10 @@
                         // Mostrar información del último pedido
                         if (data.ultimo_pedido) {
                             const fecha = new Date(data.ultimo_pedido.fecha_pedido);
-                            const hora = fecha.toLocaleTimeString('es-PE', { 
+                            const hora = fecha.toLocaleTimeString('es-ES', { 
                                 hour: '2-digit', 
-                                minute: '2-digit' 
+                                minute: '2-digit',
+                                hour12: true
                             });
                             ultimoPedidoInfo.textContent = `Último pedido: #${data.ultimo_pedido.id} - ${data.ultimo_pedido.cliente_nombre} (${hora})`;
                         }
@@ -1978,6 +2290,10 @@
     
     // Inicializar notificaciones al cargar la página
     document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar funciones responsivas
+        sincronizarTabs();
+        mejorarExperienciaTactil();
+        
         // Esperar un poco antes de iniciar las notificaciones
         setTimeout(() => {
             // Cargar el estado inicial sin reproducir sonido

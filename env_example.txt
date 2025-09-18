@@ -1,0 +1,12 @@
+# Variables de entorno para producción
+SECRET_KEY=tu-clave-secreta-muy-segura-aqui
+FLASK_ENV=production
+FLASK_DEBUG=False
+
+# Configuración de base de datos (AlwaysData usará PostgreSQL)
+DATABASE_URL=postgresql://usuario:password@host:puerto/database
+
+# Configuración de Twilio (si usas SMS)
+TWILIO_ACCOUNT_SID=tu_account_sid
+TWILIO_AUTH_TOKEN=tu_auth_token
+TWILIO_PHONE_NUMBER=tu_numero_twilio

@@ -14,9 +14,18 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tu-clave-secreta-aqui')
+
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "instance", "tienda.db")}'
+
+# Configuración de base de datos para desarrollo y producción
+if os.environ.get('DATABASE_URL') and 'postgresql' in os.environ.get('DATABASE_URL', ''):
+    # Producción (AlwaysData con PostgreSQL)
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+else:
+    # Desarrollo (SQLite local)
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "instance", "tienda.db")}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -88,7 +97,7 @@ class Pedido(db.Model):
     cliente_comentarios = db.Column(db.Text)
     total = db.Column(db.Float, nullable=False)
     estado = db.Column(db.String(20), default='pendiente')  # pendiente, confirmado, entregado
-    fecha_pedido = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha_pedido = db.Column(db.DateTime, default=datetime.now)
     items = db.relationship('PedidoItem', backref='pedido', lazy=True)
     
     def to_dict(self):
@@ -411,8 +420,8 @@ def crear_pedido():
             mensaje += f"  📊 Stock restante: {item.producto.stock}\n"
         
         mensaje += f"\n💰 *Total: ${pedido.total:.2f}*\n"
-        mensaje += f"📅 Fecha: {pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M')}\n"
-        mensaje += f"⏰ Hora: {pedido.fecha_pedido.strftime('%H:%M')}"
+        mensaje += f"📅 Fecha: {pedido.fecha_pedido.strftime('%d/%m/%Y %I:%M %p')}\n"
+        mensaje += f"⏰ Hora: {pedido.fecha_pedido.strftime('%I:%M %p')}"
         
         # Enviar a WhatsApp
         enviar_whatsapp(mensaje)
@@ -716,7 +725,7 @@ def confirmar_pedido(pedido_id):
         
         mensaje_cliente += f"\n💰 *Total: ${pedido.total:.2f}*\n"
         mensaje_cliente += f"📍 *Dirección de entrega:* {pedido.cliente_direccion}\n"
-        mensaje_cliente += f"📅 *Fecha del pedido:* {pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M')}\n\n"
+        mensaje_cliente += f"📅 *Fecha del pedido:* {pedido.fecha_pedido.strftime('%d/%m/%Y %I:%M %p')}\n\n"
         
         if pedido.cliente_comentarios:
             mensaje_cliente += f"💬 *Tus comentarios:* {pedido.cliente_comentarios}\n\n"
