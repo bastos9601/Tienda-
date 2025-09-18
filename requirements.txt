@@ -8,5 +8,4 @@ python-dotenv==1.0.0
 twilio==8.10.0
 Pillow==10.0.1
 psycopg2-binary==2.9.7
-pymysql==1.1.2
 gunicorn==21.2.0

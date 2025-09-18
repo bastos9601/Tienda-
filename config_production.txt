@@ -1,0 +1,12 @@
+# Configuración para PythonAnywhere
+SECRET_KEY=tu-clave-secreta-muy-segura-aqui-cambiala
+DATABASE_URL=mysql+pymysql://tu_usuario:tu_password@mysql.server/tu_usuario$nombre_base_datos
+
+# Configuración de WhatsApp (opcional)
+WHATSAPP_TOKEN=tu_token_de_whatsapp
+WHATSAPP_PHONE_ID=tu_phone_id
+WHATSAPP_RECIPIENT=51999999999
+
+# Configuración de la aplicación
+FLASK_ENV=production
+FLASK_DEBUG=False
