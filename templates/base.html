@@ -216,7 +216,7 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <button class="btn btn-success text-white ms-2" data-bs-toggle="modal" data-bs-target="#cartModal">
+                    <button class="btn btn-success text-white ms-2" data-bs-toggle="modal" data-bs-target="#cartModal" id="navbar-cart-btn" style="display: none;">
                         <i class="fas fa-shopping-cart"></i> Carrito (<span id="cart-count">0</span>)
                     </button>
                 </div>
@@ -452,18 +452,31 @@
             const cartCount = document.getElementById('cart-count');
             const cartTotal = document.getElementById('cart-total');
             const checkoutBtn = document.getElementById('checkout-btn');
+            const cartFloatCount = document.getElementById('cart-float-count');
+            const cartFloatBtn = document.getElementById('cart-float-btn');
+            const navbarCartBtn = document.getElementById('navbar-cart-btn');
             
             if (cart.length === 0) {
-            cartItems.innerHTML = '<p class="text-muted">Tu carrito está vacío</p>';
-            cartCount.textContent = '0';
-            cartTotal.textContent = '$0.00';
-            checkoutBtn.disabled = true;
-            
-            // Deshabilitar botón de limpiar carrito
-            const clearCartBtn = document.getElementById('clear-cart-btn');
-            if (clearCartBtn) {
-                clearCartBtn.disabled = true;
-            }
+                cartItems.innerHTML = '<p class="text-muted">Tu carrito está vacío</p>';
+                cartCount.textContent = '0';
+                cartTotal.textContent = '$0.00';
+                checkoutBtn.disabled = true;
+                
+                // Ocultar botón flotante del carrito
+                if (cartFloatBtn) {
+                    cartFloatBtn.style.display = 'none';
+                }
+                
+                // Ocultar botón del carrito en la barra de navegación
+                if (navbarCartBtn) {
+                    navbarCartBtn.style.display = 'none';
+                }
+                
+                // Deshabilitar botón de limpiar carrito
+                const clearCartBtn = document.getElementById('clear-cart-btn');
+                if (clearCartBtn) {
+                    clearCartBtn.disabled = true;
+                }
                 return;
             }
             
@@ -501,6 +514,17 @@
             cartCount.textContent = cart.length;
             cartTotal.textContent = `$${total.toFixed(2)}`;
             checkoutBtn.disabled = false;
+            
+            // Mostrar y actualizar botón flotante del carrito
+            if (cartFloatBtn && cartFloatCount) {
+                cartFloatBtn.style.display = 'flex';
+                cartFloatCount.textContent = cart.length;
+            }
+            
+            // Ocultar botón del carrito en la barra de navegación (solo mostramos el flotante)
+            if (navbarCartBtn) {
+                navbarCartBtn.style.display = 'none';
+            }
             
             // Habilitar botón de limpiar carrito
             const clearCartBtn = document.getElementById('clear-cart-btn');
@@ -813,6 +837,14 @@
         </a>
     </div>
     
+    <!-- Botón de Carrito Flotante -->
+    <div id="cart-float-btn" class="cart-float" style="display: none;" data-bs-toggle="modal" data-bs-target="#cartModal">
+        <div class="cart-float-content">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-float-count" id="cart-float-count">0</span>
+        </div>
+    </div>
+    
     <style>
         .whatsapp-float {
             position: fixed;
@@ -859,6 +891,74 @@
             
             .whatsapp-float i {
                 line-height: 50px;
+            }
+        }
+        
+        /* Estilos para el botón flotante del carrito */
+        .cart-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 20px;
+            right: 90px; /* Posicionado a la izquierda del botón de WhatsApp */
+            background-color: #28a745;
+            color: white;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-float:hover {
+            background-color: #218838;
+            transform: scale(1.1);
+        }
+        
+        .cart-float-content {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .cart-float-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+        
+        @media (max-width: 768px) {
+            .cart-float {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 75px;
+                font-size: 20px;
+            }
+            
+            .cart-float-count {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
             }
         }
     </style>
