@@ -195,6 +195,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">Productos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://drive.google.com/file/d/1E1NfS7DhtuR7sKFUzmhHwAtrF7ayv8o-/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-download"></i> Descargar APK
+                        </a>
+                    </li>
                     <!-- <li class="nav-item">
                         <a class="nav-link" href="/admin">Administración</a>
                     </li> -->
@@ -457,10 +462,10 @@
             const navbarCartBtn = document.getElementById('navbar-cart-btn');
             
             if (cart.length === 0) {
-                cartItems.innerHTML = '<p class="text-muted">Tu carrito está vacío</p>';
-                cartCount.textContent = '0';
-                cartTotal.textContent = '$0.00';
-                checkoutBtn.disabled = true;
+            cartItems.innerHTML = '<p class="text-muted">Tu carrito está vacío</p>';
+            cartCount.textContent = '0';
+            cartTotal.textContent = '$0.00';
+            checkoutBtn.disabled = true;
                 
                 // Ocultar botón flotante del carrito
                 if (cartFloatBtn) {
@@ -471,12 +476,12 @@
                 if (navbarCartBtn) {
                     navbarCartBtn.style.display = 'none';
                 }
-                
-                // Deshabilitar botón de limpiar carrito
-                const clearCartBtn = document.getElementById('clear-cart-btn');
-                if (clearCartBtn) {
-                    clearCartBtn.disabled = true;
-                }
+            
+            // Deshabilitar botón de limpiar carrito
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+            if (clearCartBtn) {
+                clearCartBtn.disabled = true;
+            }
                 return;
             }
             
