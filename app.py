@@ -416,10 +416,10 @@ def crear_pedido():
         mensaje += "\n📦 *Productos:*\n"
         
         for item in pedido.items:
-            mensaje += f"• {item.producto.nombre} x{item.cantidad} - ${item.precio_unitario * item.cantidad:.2f}\n"
+            mensaje += f"• {item.producto.nombre} x{item.cantidad} - S/{item.precio_unitario * item.cantidad:.2f}\n"
             mensaje += f"  📊 Stock restante: {item.producto.stock}\n"
         
-        mensaje += f"\n💰 *Total: ${pedido.total:.2f}*\n"
+        mensaje += f"\n💰 *Total: S/{pedido.total:.2f}*\n"
         mensaje += f"📅 Fecha: {pedido.fecha_pedido.strftime('%d/%m/%Y %I:%M %p')}\n"
         mensaje += f"⏰ Hora: {pedido.fecha_pedido.strftime('%I:%M %p')}"
         
@@ -721,9 +721,9 @@ def confirmar_pedido(pedido_id):
         mensaje_cliente += f"📋 *Resumen de tu pedido:*\n"
         
         for item in pedido.items:
-            mensaje_cliente += f"• {item.producto.nombre} x{item.cantidad} - ${item.precio_unitario * item.cantidad:.2f}\n"
+            mensaje_cliente += f"• {item.producto.nombre} x{item.cantidad} - S/{item.precio_unitario * item.cantidad:.2f}\n"
         
-        mensaje_cliente += f"\n💰 *Total: ${pedido.total:.2f}*\n"
+        mensaje_cliente += f"\n💰 *Total: S/{pedido.total:.2f}*\n"
         mensaje_cliente += f"📍 *Dirección de entrega:* {pedido.cliente_direccion}\n"
         mensaje_cliente += f"📅 *Fecha del pedido:* {pedido.fecha_pedido.strftime('%d/%m/%Y %I:%M %p')}\n\n"
         

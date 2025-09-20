@@ -262,7 +262,7 @@
                     <div class="cart-total mt-3">
                         <div class="d-flex justify-content-between">
                             <span>Total:</span>
-                            <span id="cart-total">$0.00</span>
+                            <span id="cart-total">S/0.00</span>
                         </div>
                     </div>
                 </div>
@@ -413,7 +413,7 @@
                                 <hr>
                                 <div class="d-flex justify-content-between">
                                     <strong>Total:</strong>
-                                    <strong id="order-total">$0.00</strong>
+                                    <strong id="order-total">S/0.00</strong>
                                 </div>
                             </div>
                         </div>
@@ -464,7 +464,7 @@
             if (cart.length === 0) {
             cartItems.innerHTML = '<p class="text-muted">Tu carrito está vacío</p>';
             cartCount.textContent = '0';
-            cartTotal.textContent = '$0.00';
+            cartTotal.textContent = 'S/0.00';
             checkoutBtn.disabled = true;
                 
                 // Ocultar botón flotante del carrito
@@ -497,7 +497,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="mb-1">${item.nombre}</h6>
-                                <small class="text-muted">$${item.precio.toFixed(2)} c/u</small>
+                                <small class="text-muted">S/${item.precio.toFixed(2)} c/u</small>
                             </div>
                             <div class="d-flex align-items-center">
                                 <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
@@ -509,7 +509,7 @@
                             </div>
                         </div>
                         <div class="text-end">
-                            <strong>$${itemTotal.toFixed(2)}</strong>
+                            <strong>S/${itemTotal.toFixed(2)}</strong>
                         </div>
                     </div>
                 `;
@@ -517,7 +517,7 @@
             
             cartItems.innerHTML = html;
             cartCount.textContent = cart.length;
-            cartTotal.textContent = `$${total.toFixed(2)}`;
+            cartTotal.textContent = `S/${total.toFixed(2)}`;
             checkoutBtn.disabled = false;
             
             // Mostrar y actualizar botón flotante del carrito
@@ -683,18 +683,18 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div>
                             <span class="fw-bold">${item.nombre}</span>
-                            <small class="text-muted d-block">$${item.precio.toFixed(2)} c/u</small>
+                            <small class="text-muted d-block">S/${item.precio.toFixed(2)} c/u</small>
                         </div>
                         <div class="text-end">
                             <span class="badge bg-primary">${item.cantidad}</span>
-                            <div class="fw-bold">$${itemTotal.toFixed(2)}</div>
+                            <div class="fw-bold">S/${itemTotal.toFixed(2)}</div>
                         </div>
                     </div>
                 `;
             });
             
             orderSummary.innerHTML = html;
-            orderTotal.textContent = `$${total.toFixed(2)}`;
+            orderTotal.textContent = `S/${total.toFixed(2)}`;
         }
         
         document.getElementById('confirm-order-btn').addEventListener('click', function() {
@@ -774,7 +774,7 @@
                     const successMessage = `¡Pedido realizado exitosamente!
 
 📋 Número de pedido: #${data.pedido_id}
-💰 Total: $${orderData.total.toFixed(2)}
+💰 Total: S/${orderData.total.toFixed(2)}
 📱 Te contactaremos por WhatsApp: ${telefono}
 
 ¡Gracias por tu compra!`;
