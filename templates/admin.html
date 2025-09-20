@@ -123,6 +123,12 @@
                         <span class="d-none d-sm-inline ms-1">Notif.</span>
                     </button>
                     
+                    <!-- Botón para configurar notificaciones del navegador -->
+                    <button class="btn btn-outline-success" id="configNotificationsBtn" title="Configurar notificaciones del navegador">
+                        <i class="fas fa-cog" id="configIcon"></i>
+                        <span class="d-none d-sm-inline ms-1">Config.</span>
+                    </button>
+                    
                     <!-- Botón para probar sonido -->
                     <button class="btn btn-outline-success" id="testSoundBtn" title="Probar sonido de notificación">
                         <i class="fas fa-volume-up"></i>
@@ -2159,6 +2165,22 @@
         }
     }
     
+    // Variables para detectar visibilidad de la página
+    let paginaVisible = true;
+    let ultimaVerificacion = Date.now();
+    
+    // Detectar cuando la página está visible o en segundo plano
+    document.addEventListener('visibilitychange', function() {
+        paginaVisible = !document.hidden;
+        if (paginaVisible) {
+            console.log('📱 Página visible - verificando pedidos pendientes');
+            // Verificar inmediatamente cuando la página vuelve a ser visible
+            actualizarNotificaciones();
+        } else {
+            console.log('📱 Página en segundo plano - notificaciones seguirán funcionando');
+        }
+    });
+    
     // Función para actualizar notificaciones
     function actualizarNotificaciones() {
         if (!notificacionesActivas) return;
@@ -2220,11 +2242,30 @@
                             
                             // Mostrar notificación del navegador si está disponible
                             if ('Notification' in window && Notification.permission === 'granted') {
-                                new Notification('🛒 Nuevo Pedido', {
-                                    body: `Pedido #${data.ultimo_pedido.id} de ${data.ultimo_pedido.cliente_nombre} - S/${data.ultimo_pedido.total}`,
+                                // Crear notificación más detallada
+                                const notificacion = new Notification('🛒 Nuevo Pedido Recibido', {
+                                    body: `Pedido #${data.ultimo_pedido.id} de ${data.ultimo_pedido.cliente_nombre}\nTotal: S/${data.ultimo_pedido.total}\nHaz clic para ver detalles`,
                                     icon: '/static/favicon.ico',
-                                    tag: 'nuevo-pedido'
+                                    tag: 'nuevo-pedido',
+                                    requireInteraction: true, // Mantener la notificación hasta que el usuario la cierre
+                                    badge: '/static/favicon.ico'
                                 });
+                                
+                                // Agregar evento de clic para abrir la página
+                                notificacion.onclick = function() {
+                                    window.focus();
+                                    // Cambiar a la pestaña de pedidos
+                                    const pedidosTab = document.getElementById('pedidos-tab');
+                                    if (pedidosTab) {
+                                        pedidosTab.click();
+                                    }
+                                    notificacion.close();
+                                };
+                                
+                                // Cerrar automáticamente después de 10 segundos
+                                setTimeout(() => {
+                                    notificacion.close();
+                                }, 10000);
                             }
                             
                             // Hacer parpadear la pestaña si no está activa
@@ -2283,10 +2324,63 @@
         console.log('🔊 Probando sonido de notificación...');
     });
     
-    // Solicitar permisos de notificación del navegador
-    if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+    // Event listener para configurar notificaciones del navegador
+    document.getElementById('configNotificationsBtn').addEventListener('click', function() {
+        if ('Notification' in window) {
+            if (Notification.permission === 'granted') {
+                alert('✅ Las notificaciones del navegador ya están activadas.\n\nRecibirás notificaciones de nuevos pedidos incluso cuando no estés viendo la página.');
+            } else if (Notification.permission === 'denied') {
+                alert('❌ Las notificaciones del navegador están bloqueadas.\n\nPara activarlas:\n1. Haz clic en el ícono de candado en la barra de direcciones\n2. Selecciona "Permitir" en notificaciones\n3. Recarga la página');
+            } else {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        alert('✅ ¡Notificaciones activadas!\n\nAhora recibirás notificaciones de nuevos pedidos incluso cuando no estés viendo la página.');
+                        mostrarNotificacionPrueba();
+                    } else {
+                        alert('❌ Permisos de notificación denegados.\n\nLas notificaciones del navegador no funcionarán.');
+                    }
+                });
+            }
+        } else {
+            alert('❌ Tu navegador no soporta notificaciones del sistema.\n\nUsa Chrome, Firefox o Edge para una mejor experiencia.');
+        }
+    });
+    
+    // Función para solicitar permisos de notificación
+    function solicitarPermisosNotificacion() {
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        console.log('✅ Permisos de notificación concedidos');
+                        mostrarNotificacionPrueba();
+                    } else {
+                        console.log('❌ Permisos de notificación denegados');
+                    }
+                });
+            } else if (Notification.permission === 'granted') {
+                console.log('✅ Permisos de notificación ya concedidos');
+            } else {
+                console.log('❌ Permisos de notificación denegados');
+            }
+        } else {
+            console.log('❌ Este navegador no soporta notificaciones');
+        }
     }
+    
+    // Función para mostrar notificación de prueba
+    function mostrarNotificacionPrueba() {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('🔔 Notificaciones Activadas', {
+                body: 'Ahora recibirás notificaciones de nuevos pedidos',
+                icon: '/static/favicon.ico',
+                tag: 'configuracion'
+            });
+        }
+    }
+    
+    // Solicitar permisos automáticamente al cargar la página
+    solicitarPermisosNotificacion();
     
     // Inicializar notificaciones al cargar la página
     document.addEventListener('DOMContentLoaded', function() {

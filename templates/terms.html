@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Términos y Condiciones - {{ configuracion.nombre_tienda if configuracion else 'Mi Tienda' }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        Términos y Condiciones
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="terms-content">
+                        <div class="mb-4">
+                            <h4 class="text-primary">1. Información del Pedido</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Los precios mostrados son finales e incluyen todos los impuestos aplicables.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    La disponibilidad de productos está sujeta al stock disponible al momento del pedido.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Nos reservamos el derecho de modificar precios sin previo aviso.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-primary">2. Proceso de Pedido</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Al realizar un pedido, aceptas estos términos y condiciones.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Los pedidos se procesan en orden de llegada.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Te contactaremos por WhatsApp para confirmar tu pedido.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    El tiempo de entrega puede variar según la demanda.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-primary">3. Entrega</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    La entrega se realizará en la dirección proporcionada.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Debes estar disponible en la dirección de entrega.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Si no estás disponible, se coordinará una nueva entrega.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Los costos de reenvío corren por cuenta del cliente.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-primary">4. Pago</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    El pago se realiza al momento de la entrega.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Aceptamos efectivo y transferencias bancarias.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Debes tener el monto exacto o cambio disponible.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-primary">5. Cancelaciones</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Puedes cancelar tu pedido antes de que sea confirmado.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Una vez confirmado, las cancelaciones están sujetas a disponibilidad.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Contacta por WhatsApp para cancelaciones.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-primary">6. Responsabilidad</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Nos esforzamos por mantener la calidad de nuestros productos.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Si hay algún problema con tu pedido, contáctanos inmediatamente.
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Resolveremos cualquier inconveniente de la mejor manera posible.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Nota:</strong> Estos términos y condiciones pueden ser actualizados sin previo aviso. 
+                            Te recomendamos revisarlos periódicamente.
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted">
+                                <small>
+                                    Última actualización: {{ moment().format('DD/MM/YYYY') if moment else 'Diciembre 2024' }}
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="javascript:history.back()" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Volver
+                    </a>
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-home me-1"></i>
+                        Ir al Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.terms-content {
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.terms-content h4 {
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    position: relative;
+}
+
+.terms-content h4::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 30px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border-radius: 2px;
+}
+
+.terms-content ul {
+    margin-bottom: 2rem;
+}
+
+.terms-content ul li {
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    position: relative;
+    padding-left: 1rem;
+}
+
+.terms-content ul li:hover {
+    background-color: #f8f9fa;
+    padding-left: 1.5rem;
+    border-radius: 8px;
+}
+
+.terms-content ul li:last-child {
+    border-bottom: none;
+}
+
+.terms-content ul li i {
+    color: #28a745;
+    font-size: 1.2rem;
+    margin-right: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.terms-content ul li:hover i {
+    transform: scale(1.1);
+}
+
+.card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.card-header {
+    border-radius: 20px 20px 0 0 !important;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    padding: 2rem;
+}
+
+.card-header h2 {
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 3rem;
+    background: white;
+}
+
+.card-footer {
+    border-radius: 0 0 20px 20px !important;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    padding: 2rem;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border: none;
+    border-radius: 15px;
+    border-left: 5px solid #17a2b8;
+    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.1);
+}
+
+.btn {
+    border-radius: 25px;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    border: none;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.terms-content > div {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.terms-content > div:nth-child(1) { animation-delay: 0.1s; }
+.terms-content > div:nth-child(2) { animation-delay: 0.2s; }
+.terms-content > div:nth-child(3) { animation-delay: 0.3s; }
+.terms-content > div:nth-child(4) { animation-delay: 0.4s; }
+.terms-content > div:nth-child(5) { animation-delay: 0.5s; }
+.terms-content > div:nth-child(6) { animation-delay: 0.6s; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 2rem 1.5rem;
+    }
+    
+    .card-header {
+        padding: 1.5rem;
+    }
+    
+    .terms-content h4::before {
+        display: none;
+    }
+    
+    .terms-content h4 {
+        padding-left: 0;
+    }
+}
+</style>
+{% endblock %}

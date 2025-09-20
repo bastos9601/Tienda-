@@ -960,6 +960,11 @@ def tienda_index():
     categorias = Categoria.query.filter_by(activa=True).all()
     return render_template('index.html', productos=productos, categorias=categorias)
 
+@app.route('/terms')
+def terms():
+    """Página de términos y condiciones"""
+    return render_template('terms.html')
+
 @app.route('/admin')
 @login_required
 def panel_admin():
