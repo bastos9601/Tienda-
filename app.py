@@ -19,9 +19,16 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Configuración de base de datos para desarrollo y producción
-if os.environ.get('DATABASE_URL') and 'postgresql' in os.environ.get('DATABASE_URL', ''):
-    # Producción (AlwaysData con PostgreSQL)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+database_url = os.environ.get('DATABASE_URL')
+if database_url and ('postgresql' in database_url or 'postgres' in database_url):
+    # Producción (Koyeb con PostgreSQL)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    # Configuraciones adicionales para PostgreSQL en producción
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'connect_args': {'sslmode': 'require'}
+    }
 else:
     # Desarrollo (SQLite local)
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "instance", "tienda.db")}'

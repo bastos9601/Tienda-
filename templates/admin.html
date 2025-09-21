@@ -219,7 +219,7 @@
                             <div class="card-footer bg-light p-2">
                                 <!-- Botones de acción responsivos -->
                                 <div class="d-grid gap-2 d-md-flex">
-                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editarProducto({{ producto.id }}, '{{ producto.nombre|replace("'", "\\'") }}', '{{ producto.descripcion|replace("'", "\\'") if producto.descripcion else "" }}', {{ producto.precio }}, {{ producto.stock }}, '{{ producto.imagen if producto.imagen else "" }}', {{ producto.activo|lower }}, {{ producto.categoria_id if producto.categoria_id else 'null' }})" title="Editar producto">
+                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editarProducto({{ producto.id }}, '{{ producto.nombre|replace("'", "\\") }}', '{{ producto.descripcion|replace("'", "\\") if producto.descripcion else "" }}', {{ producto.precio }}, {{ producto.stock }}, '{{ producto.imagen if producto.imagen else "" }}', {{ producto.activo|lower }}, {{ producto.categoria_id if producto.categoria_id else 'null' }})" title="Editar producto">
                                         <i class="fas fa-edit"></i> 
                                         <span class="d-none d-sm-inline ms-1">Editar</span>
                                     </button>
@@ -318,11 +318,11 @@
                             <div class="card-footer bg-light p-2">
                                 <!-- Botones de acción responsivos -->
                                 <div class="d-grid gap-2 d-md-flex">
-                                    <button class="btn btn-sm btn-outline-info flex-fill" onclick="verDetallePedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\'") }}', '{{ pedido.cliente_telefono|replace("'", "\\'") }}', '{{ pedido.cliente_direccion|replace("'", "\\'") }}', {{ pedido.total }}, '{{ pedido.estado }}', '{{ pedido.fecha_pedido.strftime('%d/%m/%Y %I:%M %p') }}', '{{ pedido.cliente_comentarios|replace("'", "\\'") if pedido.cliente_comentarios else "" }}')" title="Ver detalles del pedido">
+                                    <button class="btn btn-sm btn-outline-info flex-fill" onclick="verDetallePedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\") }}', '{{ pedido.cliente_telefono|replace("'", "\\") }}', '{{ pedido.cliente_direccion|replace("'", "\\") }}', {{ pedido.total }}, '{{ pedido.estado }}', '{{ pedido.fecha_pedido.strftime('%d/%m/%Y %I:%M %p') }}', '{{ pedido.cliente_comentarios|replace("'", "\\") if pedido.cliente_comentarios else "" }}')" title="Ver detalles del pedido">
                                         <i class="fas fa-eye"></i> 
                                         <span class="d-none d-sm-inline ms-1">Ver</span>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="eliminarPedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\'") }}')" title="Eliminar pedido">
+                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="eliminarPedido({{ pedido.id }}, '{{ pedido.cliente_nombre|replace("'", "\\") }}')" title="Eliminar pedido">
                                         <i class="fas fa-trash"></i> 
                                         <span class="d-none d-sm-inline ms-1">Eliminar</span>
                                     </button>
@@ -415,11 +415,11 @@
                             <div class="card-footer bg-light p-2">
                                 <!-- Botones de acción responsivos -->
                                 <div class="d-grid gap-2 d-md-flex">
-                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\'") }}', '{{ categoria.descripcion|replace("'", "\\'") if categoria.descripcion else "" }}', '{{ categoria.icono }}', '{{ categoria.color }}', {{ categoria.activa|lower }})" title="Editar categoría">
+                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="editarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\") }}', '{{ categoria.descripcion|replace("'", "\\") if categoria.descripcion else "" }}', '{{ categoria.icono }}', '{{ categoria.color }}', {{ categoria.activa|lower }})" title="Editar categoría">
                                         <i class="fas fa-edit"></i> 
                                         <span class="d-none d-sm-inline ms-1">Editar</span>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="eliminarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\'") }}')" title="Eliminar categoría">
+                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="eliminarCategoria({{ categoria.id }}, '{{ categoria.nombre|replace("'", "\\") }}')" title="Eliminar categoría">
                                         <i class="fas fa-trash"></i> 
                                         <span class="d-none d-sm-inline ms-1">Eliminar</span>
                                     </button>

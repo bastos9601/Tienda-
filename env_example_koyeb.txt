@@ -1,0 +1,20 @@
+# Configuración para desarrollo local
+SECRET_KEY=tu-clave-secreta-aqui
+DATABASE_URL=sqlite:///instance/tienda.db
+
+# Configuración para producción (Koyeb)
+# Estas variables se configuran automáticamente en Koyeb
+# DATABASE_URL=postgres://koyeb-adm:npg_GSYqNavA69Rh@ep-weathered-hat-a42ecxew.us-east-1.pg.koyeb.app/koyebdb
+# SECRET_KEY=se-genera-automaticamente
+
+# Configuración de WhatsApp (configurar en Koyeb)
+WHATSAPP_TOKEN=tu_token_de_whatsapp
+WHATSAPP_PHONE_ID=tu_phone_id
+WHATSAPP_RECIPIENT=51999999999
+
+# Configuración de Flask
+FLASK_ENV=development
+FLASK_DEBUG=True
+
+# Puerto para producción
+PORT=8000

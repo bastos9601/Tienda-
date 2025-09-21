@@ -4,7 +4,7 @@ FLASK_ENV=production
 FLASK_DEBUG=False
 
 # Configuración de base de datos (AlwaysData usará PostgreSQL)
-DATABASE_URL=postgresql://usuario:password@host:puerto/database
+DATABASE_URL=postgres://koyeb-adm:npg_GSYqNavA69Rh@ep-weathered-hat-a42ecxew.us-east-1.pg.koyeb.app/koyebdb
 
 # Configuración de Twilio (si usas SMS)
 TWILIO_ACCOUNT_SID=tu_account_sid
