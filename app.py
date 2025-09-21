@@ -22,6 +22,10 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 database_url = os.environ.get('DATABASE_URL')
 if database_url and ('postgresql' in database_url or 'postgres' in database_url):
     # Producción (Koyeb con PostgreSQL)
+    # Asegurar que la URL use el esquema correcto
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     # Configuraciones adicionales para PostgreSQL en producción
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
