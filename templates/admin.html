@@ -684,8 +684,22 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="producto_imagen" class="form-label">URL de Imagen</label>
-                        <input type="url" class="form-control" id="producto_imagen">
+                        <label for="producto_imagen" class="form-label">
+                            <i class="fas fa-image"></i> Imagen del Producto
+                        </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="file" class="form-control" id="producto_imagen_file" accept="image/*" onchange="previewImage(this)">
+                                <div class="form-text">Selecciona una imagen desde tu ordenador</div>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="url" class="form-control" id="producto_imagen" placeholder="O pega una URL de imagen">
+                                <div class="form-text">O pega una URL de imagen</div>
+                            </div>
+                        </div>
+                        <div id="imagen_preview" class="mt-2" style="display: none;">
+                            <img id="preview_img" src="" alt="Vista previa" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="producto_categoria" class="form-label">
@@ -1006,24 +1020,63 @@
             return;
         }
         
-        const productoData = {
-            nombre: nombre,
-            descripcion: document.getElementById('producto_descripcion').value.trim(),
-            precio: precio,
-            stock: stock,
-            imagen: document.getElementById('producto_imagen').value.trim(),
-            activo: document.getElementById('producto_activo').checked,
-            categoria_id: document.getElementById('producto_categoria').value || null
-        };
-        
-        const url = productoId ? `/api/producto/${productoId}` : '/api/producto';
-        const method = productoId ? 'PUT' : 'POST';
+        // Verificar si hay un archivo de imagen seleccionado
+        const archivoImagen = document.getElementById('producto_imagen_file').files[0];
+        const urlImagen = document.getElementById('producto_imagen').value.trim();
         
         // Mostrar indicador de carga
         const btn = document.getElementById('guardarProductoBtn');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
         btn.disabled = true;
+        
+        // Si hay archivo de imagen, subirlo primero
+        if (archivoImagen) {
+            subirImagenYGuardarProducto(archivoImagen, nombre, productoId);
+        } else {
+            // Si no hay archivo, guardar directamente con URL
+            guardarProductoConURL(urlImagen, productoId);
+        }
+    });
+    
+    function subirImagenYGuardarProducto(archivo, nombreProducto, productoId) {
+        const formData = new FormData();
+        formData.append('imagen', archivo);
+        formData.append('nombre_producto', nombreProducto);
+        
+        fetch('/api/upload-image', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Imagen subida exitosamente, ahora guardar el producto
+                guardarProductoConURL(data.url_imagen, productoId);
+            } else {
+                throw new Error(data.error || 'Error al subir la imagen');
+            }
+        })
+        .catch(error => {
+            console.error('Error al subir imagen:', error);
+            alert('Error al subir la imagen: ' + error.message);
+            resetearBotonGuardar();
+        });
+    }
+    
+    function guardarProductoConURL(urlImagen, productoId) {
+        const productoData = {
+            nombre: document.getElementById('producto_nombre').value.trim(),
+            descripcion: document.getElementById('producto_descripcion').value.trim(),
+            precio: parseFloat(document.getElementById('producto_precio').value),
+            stock: parseInt(document.getElementById('producto_stock').value),
+            imagen: urlImagen,
+            activo: document.getElementById('producto_activo').checked,
+            categoria_id: document.getElementById('producto_categoria').value || null
+        };
+        
+        const url = productoId ? `/api/producto/${productoId}` : '/api/producto';
+        const method = productoId ? 'PUT' : 'POST';
         
         fetch(url, {
             method: method,
@@ -1052,10 +1105,28 @@
         .catch(error => {
             console.error('Error:', error);
             alert('Error al guardar el producto');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+            resetearBotonGuardar();
         });
-    });
+    }
+    
+    function resetearBotonGuardar() {
+        const btn = document.getElementById('guardarProductoBtn');
+        btn.innerHTML = '<i class="fas fa-save"></i> <span class="d-none d-sm-inline ms-1">Guardar</span>';
+        btn.disabled = false;
+    }
+    
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagen_preview');
+                const img = document.getElementById('preview_img');
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
     
     function editarProducto(id, nombre, descripcion, precio, stock, imagen, activo, categoria_id) {
         console.log('Editando producto ID:', id);
@@ -1075,6 +1146,17 @@
         document.getElementById('producto_stock').value = stock || '';
         document.getElementById('producto_imagen').value = imagen || '';
         document.getElementById('producto_activo').checked = activo === 'true' || activo === true;
+        
+        // Limpiar archivo de imagen y mostrar vista previa si hay URL
+        document.getElementById('producto_imagen_file').value = '';
+        if (imagen) {
+            const preview = document.getElementById('imagen_preview');
+            const img = document.getElementById('preview_img');
+            img.src = imagen;
+            preview.style.display = 'block';
+        } else {
+            document.getElementById('imagen_preview').style.display = 'none';
+        }
         
         // Establecer la categoría seleccionada
         const categoriaSelect = document.getElementById('producto_categoria');
@@ -1524,6 +1606,10 @@
         document.getElementById('productoModalTitle').innerHTML = '<i class="fas fa-box"></i> Nuevo Producto';
         document.getElementById('producto_id').value = '';
         document.getElementById('producto_activo').checked = true; // Por defecto activo
+        
+        // Limpiar vista previa de imagen
+        document.getElementById('imagen_preview').style.display = 'none';
+        document.getElementById('preview_img').src = '';
         
         // Restaurar texto del botón
         document.getElementById('guardarProductoBtn').innerHTML = '<i class="fas fa-save"></i> Guardar';

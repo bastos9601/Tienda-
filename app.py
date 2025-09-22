@@ -8,6 +8,11 @@ import os
 from dotenv import load_dotenv
 import requests
 import json
+import cloudinary
+import cloudinary.uploader
+from werkzeug.utils import secure_filename
+import uuid
+from datetime import datetime
 
 # Cargar variables de entorno
 load_dotenv()
@@ -207,6 +212,18 @@ WHATSAPP_TOKEN = os.environ.get('WHATSAPP_TOKEN')
 WHATSAPP_PHONE_ID = os.environ.get('WHATSAPP_PHONE_ID')
 WHATSAPP_RECIPIENT = os.environ.get('WHATSAPP_RECIPIENT')  # Tu número de WhatsApp
 
+# Configuración de Cloudinary
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
+
+# Configurar Cloudinary
+cloudinary.config(
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET
+)
+
 def enviar_whatsapp(mensaje):
     """Envía un mensaje por WhatsApp usando la API de Twilio"""
     if not WHATSAPP_TOKEN or not WHATSAPP_PHONE_ID or not WHATSAPP_RECIPIENT:
@@ -274,6 +291,90 @@ def enviar_whatsapp_cliente(numero_cliente, mensaje):
             return False
     except Exception as e:
         print(f"❌ Error al enviar WhatsApp a cliente: {str(e)}")
+        return False
+
+def subir_imagen_cloudinary(archivo, nombre_producto=''):
+    """Sube una imagen a Cloudinary y devuelve la URL pública"""
+    if not CLOUDINARY_CLOUD_NAME or not CLOUDINARY_API_KEY or not CLOUDINARY_API_SECRET:
+        print("⚠️ Configuración de Cloudinary no encontrada")
+        return None
+    
+    print(f"🔧 DEBUG: Intentando subir imagen '{archivo.filename}' para producto '{nombre_producto}'")
+    
+    try:
+        # Validar que el archivo sea una imagen
+        if not archivo or not archivo.filename:
+            return None
+        
+        # Obtener extensión del archivo
+        extension = os.path.splitext(archivo.filename)[1].lower()
+        extensiones_permitidas = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+        
+        if extension not in extensiones_permitidas:
+            print(f"❌ Extensión no permitida: {extension}")
+            return None
+        
+        # Generar nombre único para el archivo
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        nombre_seguro = secure_filename(nombre_producto.replace(' ', '_')) if nombre_producto else 'producto'
+        public_id = f"tienda_productos/{nombre_seguro}_{timestamp}_{uuid.uuid4().hex[:8]}"
+        
+        # Subir a Cloudinary
+        result = cloudinary.uploader.upload(
+            archivo,
+            public_id=public_id,
+            folder="tienda_productos",
+            resource_type="image",
+            transformation=[
+                {"width": 800, "height": 600, "crop": "limit"},
+                {"quality": "auto"},
+                {"format": "auto"}
+            ]
+        )
+        
+        url_publica = result['secure_url']
+        print(f"✅ Imagen subida exitosamente a Cloudinary: {url_publica}")
+        return url_publica
+        
+    except Exception as e:
+        print(f"❌ Error al subir imagen a Cloudinary: {str(e)}")
+        return None
+
+def eliminar_imagen_cloudinary(url_imagen):
+    """Elimina una imagen de Cloudinary basándose en su URL"""
+    if not CLOUDINARY_CLOUD_NAME or not url_imagen:
+        return False
+    
+    try:
+        # Extraer el public_id de la URL de Cloudinary
+        if 'cloudinary.com' not in url_imagen:
+            return False
+        
+        # Extraer public_id de la URL
+        # Formato: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/filename.jpg
+        parts = url_imagen.split('/')
+        if len(parts) < 8:
+            return False
+        
+        # Buscar el public_id después de 'upload/'
+        upload_index = parts.index('upload')
+        if upload_index + 2 >= len(parts):
+            return False
+        
+        public_id = '/'.join(parts[upload_index + 2:]).split('.')[0]  # Remover extensión
+        
+        # Eliminar imagen de Cloudinary
+        result = cloudinary.uploader.destroy(public_id)
+        
+        if result.get('result') == 'ok':
+            print(f"✅ Imagen eliminada de Cloudinary: {public_id}")
+            return True
+        else:
+            print(f"⚠️ No se pudo eliminar imagen de Cloudinary: {result}")
+            return False
+        
+    except Exception as e:
+        print(f"❌ Error al eliminar imagen de Cloudinary: {str(e)}")
         return False
 
 # Rutas de autenticación
@@ -469,16 +570,36 @@ def get_pedido(pedido_id):
 @login_required
 def crear_producto():
     try:
-        data = request.json
-        
-        producto = Producto(
-            nombre=data['nombre'],
-            descripcion=data.get('descripcion', ''),
-            precio=float(data['precio']),
-            imagen=data.get('imagen', ''),
-            stock=int(data.get('stock', 0)),
-            categoria_id=data.get('categoria_id') if data.get('categoria_id') else None
-        )
+        # Verificar si es una petición con archivo (multipart/form-data)
+        if request.files:
+            # Manejar subida de imagen
+            imagen_url = ''
+            if 'imagen' in request.files and request.files['imagen'].filename:
+                archivo = request.files['imagen']
+                nombre_producto = request.form.get('nombre', '')
+                imagen_url = subir_imagen_cloudinary(archivo, nombre_producto) or ''
+            
+            # Crear producto con datos del formulario
+            producto = Producto(
+                nombre=request.form.get('nombre', ''),
+                descripcion=request.form.get('descripcion', ''),
+                precio=float(request.form.get('precio', 0)),
+                imagen=imagen_url,
+                stock=int(request.form.get('stock', 0)),
+                categoria_id=request.form.get('categoria_id') if request.form.get('categoria_id') else None
+            )
+        else:
+            # Manejar petición JSON (sin archivo)
+            data = request.json
+            
+            producto = Producto(
+                nombre=data['nombre'],
+                descripcion=data.get('descripcion', ''),
+                precio=float(data['precio']),
+                imagen=data.get('imagen', ''),
+                stock=int(data.get('stock', 0)),
+                categoria_id=data.get('categoria_id') if data.get('categoria_id') else None
+            )
         
         db.session.add(producto)
         db.session.commit()
@@ -500,24 +621,56 @@ def crear_producto():
 @login_required
 def editar_producto(producto_id):
     try:
-        data = request.json
         producto = Producto.query.get_or_404(producto_id)
+        imagen_anterior = producto.imagen  # Guardar URL de imagen anterior
         
-        # Solo actualizar los campos que se envían
-        if 'nombre' in data:
-            producto.nombre = data['nombre']
-        if 'descripcion' in data:
-            producto.descripcion = data.get('descripcion', '')
-        if 'precio' in data:
-            producto.precio = float(data['precio'])
-        if 'imagen' in data:
-            producto.imagen = data.get('imagen', '')
-        if 'stock' in data:
-            producto.stock = int(data.get('stock', 0))
-        if 'activo' in data:
-            producto.activo = bool(data.get('activo', True))
-        if 'categoria_id' in data:
-            producto.categoria_id = data.get('categoria_id') if data.get('categoria_id') else None
+        # Verificar si es una petición con archivo (multipart/form-data)
+        if request.files:
+            # Manejar subida de nueva imagen
+            if 'imagen' in request.files and request.files['imagen'].filename:
+                archivo = request.files['imagen']
+                nombre_producto = request.form.get('nombre', producto.nombre)
+                nueva_imagen_url = subir_imagen_cloudinary(archivo, nombre_producto)
+                
+                if nueva_imagen_url:
+                    # Eliminar imagen anterior de Cloudinary si existe
+                    if imagen_anterior and 'cloudinary.com' in imagen_anterior:
+                        eliminar_imagen_cloudinary(imagen_anterior)
+                    
+                    producto.imagen = nueva_imagen_url
+            
+            # Actualizar otros campos del formulario
+            if request.form.get('nombre'):
+                producto.nombre = request.form.get('nombre')
+            if 'descripcion' in request.form:
+                producto.descripcion = request.form.get('descripcion', '')
+            if request.form.get('precio'):
+                producto.precio = float(request.form.get('precio'))
+            if request.form.get('stock'):
+                producto.stock = int(request.form.get('stock', 0))
+            if 'activo' in request.form:
+                producto.activo = bool(request.form.get('activo', True))
+            if 'categoria_id' in request.form:
+                producto.categoria_id = request.form.get('categoria_id') if request.form.get('categoria_id') else None
+        else:
+            # Manejar petición JSON (sin archivo)
+            data = request.json
+            
+            # Solo actualizar los campos que se envían
+            if 'nombre' in data:
+                producto.nombre = data['nombre']
+            if 'descripcion' in data:
+                producto.descripcion = data.get('descripcion', '')
+            if 'precio' in data:
+                producto.precio = float(data['precio'])
+            if 'imagen' in data:
+                producto.imagen = data.get('imagen', '')
+            if 'stock' in data:
+                producto.stock = int(data.get('stock', 0))
+            if 'activo' in data:
+                producto.activo = bool(data.get('activo', True))
+            if 'categoria_id' in data:
+                producto.categoria_id = data.get('categoria_id') if data.get('categoria_id') else None
         
         db.session.commit()
         
@@ -538,6 +691,7 @@ def editar_producto(producto_id):
 def eliminar_producto(producto_id):
     try:
         producto = Producto.query.get_or_404(producto_id)
+        imagen_url = producto.imagen  # Guardar URL de imagen para eliminarla
         
         # Verificar si el producto tiene pedidos asociados
         pedidos_con_producto = PedidoItem.query.filter_by(producto_id=producto_id).count()
@@ -554,6 +708,11 @@ def eliminar_producto(producto_id):
             # Si no tiene pedidos, eliminar completamente
             db.session.delete(producto)
             db.session.commit()
+            
+            # Eliminar imagen de Cloudinary si existe
+            if imagen_url and 'cloudinary.com' in imagen_url:
+                eliminar_imagen_cloudinary(imagen_url)
+            
             return jsonify({
                 'success': True,
                 'mensaje': 'Producto eliminado exitosamente'
@@ -561,6 +720,54 @@ def eliminar_producto(producto_id):
         
     except Exception as e:
         db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/upload-image', methods=['POST'])
+@login_required
+def subir_imagen():
+    """Sube una imagen a Cloudinary y devuelve la URL"""
+    try:
+        print("🔧 DEBUG: Ruta /api/upload-image llamada")
+        print(f"🔧 DEBUG: Archivos recibidos: {list(request.files.keys())}")
+        print(f"🔧 DEBUG: Cloudinary configurado: {bool(CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)}")
+        
+        # Verificar que se haya enviado un archivo
+        if 'imagen' not in request.files:
+            print("❌ DEBUG: No se encontró el campo 'imagen' en request.files")
+            return jsonify({
+                'success': False,
+                'error': 'No se ha enviado ningún archivo'
+            }), 400
+        
+        archivo = request.files['imagen']
+        nombre_producto = request.form.get('nombre_producto', '')
+        
+        # Verificar que el archivo no esté vacío
+        if archivo.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'No se ha seleccionado ningún archivo'
+            }), 400
+        
+        # Subir imagen a Cloudinary
+        url_imagen = subir_imagen_cloudinary(archivo, nombre_producto)
+        
+        if url_imagen:
+            return jsonify({
+                'success': True,
+                'url_imagen': url_imagen,
+                'mensaje': 'Imagen subida exitosamente'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Error al subir la imagen'
+            }), 500
+            
+    except Exception as e:
         return jsonify({
             'success': False,
             'error': str(e)

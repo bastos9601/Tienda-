@@ -10,3 +10,13 @@ DATABASE_URL=postgres://koyeb-adm:npg_GSYqNavA69Rh@ep-weathered-hat-a42ecxew.us-
 TWILIO_ACCOUNT_SID=tu_account_sid
 TWILIO_AUTH_TOKEN=tu_auth_token
 TWILIO_PHONE_NUMBER=tu_numero_twilio
+
+# Configuración de WhatsApp
+WHATSAPP_TOKEN=tu_whatsapp_token
+WHATSAPP_PHONE_ID=tu_whatsapp_phone_id
+WHATSAPP_RECIPIENT=tu_numero_whatsapp
+
+# Configuración de Cloudinary
+CLOUDINARY_CLOUD_NAME=dp1dzunfp
+CLOUDINARY_API_KEY=258478459326466
+CLOUDINARY_API_SECRET=lnHcXW--2xkJDd27CsYpXxlxaDk
