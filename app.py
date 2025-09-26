@@ -792,6 +792,31 @@ def get_categoria(categoria_id):
         'categoria': categoria.to_dict()
     })
 
+@app.route('/api/categoria/<int:categoria_id>/productos', methods=['GET'])
+@login_required
+def get_productos_categoria(categoria_id):
+    """Obtiene información sobre los productos de una categoría"""
+    try:
+        categoria = Categoria.query.get_or_404(categoria_id)
+        productos_activos = Producto.query.filter_by(categoria_id=categoria_id, activo=True).count()
+        productos_inactivos = Producto.query.filter_by(categoria_id=categoria_id, activo=False).count()
+        total_productos = productos_activos + productos_inactivos
+        
+        return jsonify({
+            'success': True,
+            'categoria': categoria.to_dict(),
+            'estadisticas': {
+                'productos_activos': productos_activos,
+                'productos_inactivos': productos_inactivos,
+                'total_productos': total_productos
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/categoria', methods=['POST'])
 @login_required
 def crear_categoria():
@@ -847,6 +872,10 @@ def editar_categoria(categoria_id):
         data = request.json
         categoria = Categoria.query.get_or_404(categoria_id)
         
+        # Guardar el estado anterior de la categoría
+        categoria_estaba_activa = categoria.activa
+        productos_desactivados = 0
+        
         # Solo actualizar los campos que se envían
         if 'nombre' in data:
             categoria.nombre = data['nombre']
@@ -857,14 +886,45 @@ def editar_categoria(categoria_id):
         if 'color' in data:
             categoria.color = data.get('color', '#007bff')
         if 'activa' in data:
-            categoria.activa = bool(data.get('activa', True))
+            nueva_activa = bool(data.get('activa', True))
+            
+            # Si la categoría se está desactivando, desactivar todos sus productos
+            if categoria_estaba_activa and not nueva_activa:
+                productos_categoria = Producto.query.filter_by(categoria_id=categoria_id, activo=True).all()
+                for producto in productos_categoria:
+                    producto.activo = False
+                    productos_desactivados += 1
+            
+            # Si la categoría se está reactivando, reactivar productos que fueron desactivados por esta categoría
+            elif not categoria_estaba_activa and nueva_activa:
+                # Buscar productos de esta categoría que estén desactivados
+                # (solo reactivar si no tienen pedidos asociados para evitar problemas de stock)
+                productos_desactivados_categoria = Producto.query.filter_by(categoria_id=categoria_id, activo=False).all()
+                for producto in productos_desactivados_categoria:
+                    # Verificar si el producto tiene pedidos asociados
+                    tiene_pedidos = PedidoItem.query.filter_by(producto_id=producto.id).count() > 0
+                    if not tiene_pedidos:
+                        producto.activo = True
+                        productos_desactivados -= 1  # Usar como contador de productos reactivados
+            
+            categoria.activa = nueva_activa
         
         db.session.commit()
         
+        # Preparar mensaje de respuesta
+        mensaje = 'Categoría actualizada exitosamente'
+        if productos_desactivados > 0:
+            mensaje += f'. Se desactivaron {productos_desactivados} productos de esta categoría.'
+        elif productos_desactivados < 0:
+            productos_reactivados = abs(productos_desactivados)
+            mensaje += f'. Se reactivaron {productos_reactivados} productos de esta categoría.'
+        
         return jsonify({
             'success': True,
-            'mensaje': 'Categoría actualizada exitosamente',
-            'categoria': categoria.to_dict()
+            'mensaje': mensaje,
+            'categoria': categoria.to_dict(),
+            'productos_afectados': abs(productos_desactivados) if productos_desactivados != 0 else 0,
+            'accion': 'desactivados' if productos_desactivados > 0 else ('reactivados' if productos_desactivados < 0 else 'ninguna')
         })
         
     except Exception as e:
