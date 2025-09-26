@@ -152,12 +152,25 @@
                         <span class="d-none d-sm-inline">Gestión de Productos</span>
                         <span class="d-inline d-sm-none">Productos</span>
                     </h3>
-                    <button class="btn btn-primary w-100 w-sm-auto" data-bs-toggle="modal" data-bs-target="#productoModal">
-                        <i class="fas fa-plus"></i> 
-                        <span class="d-none d-sm-inline">Nuevo Producto</span>
-                        <span class="d-inline d-sm-none">Nuevo</span>
-                    </button>
+                    <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-sm-auto">
+                        <button class="btn btn-success" onclick="exportarProductos()">
+                            <i class="fas fa-download"></i> 
+                            <span class="d-none d-sm-inline">Exportar</span>
+                        </button>
+                        <button class="btn btn-info" onclick="document.getElementById('importarArchivo').click()">
+                            <i class="fas fa-upload"></i> 
+                            <span class="d-none d-sm-inline">Importar</span>
+                        </button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productoModal">
+                            <i class="fas fa-plus"></i> 
+                            <span class="d-none d-sm-inline">Nuevo Producto</span>
+                            <span class="d-inline d-sm-none">Nuevo</span>
+                        </button>
+                    </div>
                 </div>
+                
+                <!-- Input oculto para importar archivos -->
+                <input type="file" id="importarArchivo" accept=".txt" style="display: none;" onchange="importarProductos(this)">
                 
                 <!-- Grid responsivo de productos -->
                 <div class="row g-3">
@@ -2500,5 +2513,133 @@
     document.getElementById('pedidos-tab').addEventListener('click', function() {
         setTimeout(actualizarNotificaciones, 500);
     });
+    
+    // ===== FUNCIONES DE EXPORTAR/IMPORTAR PRODUCTOS =====
+    
+    function exportarProductos() {
+        // Mostrar indicador de carga
+        const btnExportar = event.target.closest('button');
+        const textoOriginal = btnExportar.innerHTML;
+        btnExportar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportando...';
+        btnExportar.disabled = true;
+        
+        fetch('/api/productos/exportar')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al exportar productos');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Crear enlace de descarga
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `productos_exportados_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                // Mostrar mensaje de éxito
+                mostrarNotificacion('✅ Productos exportados exitosamente', 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarNotificacion('❌ Error al exportar productos: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Restaurar botón
+                btnExportar.innerHTML = textoOriginal;
+                btnExportar.disabled = false;
+            });
+    }
+    
+    function importarProductos(input) {
+        const archivo = input.files[0];
+        if (!archivo) return;
+        
+        // Validar tipo de archivo
+        if (!archivo.name.toLowerCase().endsWith('.txt')) {
+            mostrarNotificacion('❌ Por favor selecciona un archivo de texto (.txt)', 'error');
+            input.value = '';
+            return;
+        }
+        
+        // Confirmar importación
+        const confirmacion = confirm(`¿Estás seguro de que quieres importar productos desde "${archivo.name}"?\n\nEsto puede actualizar productos existentes y crear nuevos productos.`);
+        if (!confirmacion) {
+            input.value = '';
+            return;
+        }
+        
+        // Mostrar indicador de carga
+        const btnImportar = document.querySelector('button[onclick*="importarArchivo"]');
+        const textoOriginal = btnImportar.innerHTML;
+        btnImportar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importando...';
+        btnImportar.disabled = true;
+        
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+        
+        fetch('/api/productos/importar', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const detalles = data.detalles;
+                let mensaje = `✅ Importación completada exitosamente!\n\n`;
+                mensaje += `📦 Productos importados: ${detalles.productos_importados}\n`;
+                mensaje += `🔄 Productos actualizados: ${detalles.productos_actualizados}\n`;
+                mensaje += `🏷️ Categorías creadas: ${detalles.categorias_creadas}\n`;
+                mensaje += `❌ Errores: ${detalles.errores}`;
+                
+                if (detalles.lista_errores && detalles.lista_errores.length > 0) {
+                    mensaje += `\n\nErrores encontrados:\n${detalles.lista_errores.join('\n')}`;
+                }
+                
+                mostrarNotificacion(mensaje, 'success');
+                
+                // Recargar la lista de productos
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } else {
+                mostrarNotificacion('❌ Error al importar productos: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacion('❌ Error al importar productos: ' + error.message, 'error');
+        })
+        .finally(() => {
+            // Restaurar botón y limpiar input
+            btnImportar.innerHTML = textoOriginal;
+            btnImportar.disabled = false;
+            input.value = '';
+        });
+    }
+    
+    function mostrarNotificacion(mensaje, tipo = 'info') {
+        // Crear elemento de notificación
+        const notificacion = document.createElement('div');
+        notificacion.className = `alert alert-${tipo === 'error' ? 'danger' : tipo} alert-dismissible fade show position-fixed`;
+        notificacion.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px; white-space: pre-line;';
+        notificacion.innerHTML = `
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notificacion);
+        
+        // Auto-remover después de 5 segundos
+        setTimeout(() => {
+            if (notificacion.parentNode) {
+                notificacion.remove();
+            }
+        }, 5000);
+    }
 </script>
 {% endblock %}

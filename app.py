@@ -13,6 +13,8 @@ import cloudinary.uploader
 from werkzeug.utils import secure_filename
 import uuid
 from datetime import datetime
+import csv
+import io
 
 # Cargar variables de entorno
 load_dotenv()
@@ -1167,6 +1169,220 @@ def cambiar_password():
         return jsonify({
             'success': False,
             'error': str(e)
+        }), 500
+
+# ===== RUTAS DE EXPORTAR/IMPORTAR PRODUCTOS =====
+
+@app.route('/api/productos/exportar', methods=['GET'])
+@login_required
+def exportar_productos():
+    """Exporta todos los productos a un archivo de texto"""
+    try:
+        productos = Producto.query.all()
+        categorias = {cat.id: cat.nombre for cat in Categoria.query.all()}
+        
+        # Crear contenido del archivo
+        contenido = []
+        contenido.append("=== EXPORTACIÓN DE PRODUCTOS ===")
+        contenido.append(f"Fecha de exportación: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
+        contenido.append(f"Total de productos: {len(productos)}")
+        contenido.append("")
+        contenido.append("FORMATO:")
+        contenido.append("ID | NOMBRE | DESCRIPCIÓN | PRECIO | STOCK | CATEGORÍA | ACTIVO | IMAGEN_URL")
+        contenido.append("-" * 100)
+        contenido.append("")
+        
+        for producto in productos:
+            categoria_nombre = categorias.get(producto.categoria_id, 'Sin categoría')
+            estado = "Sí" if producto.activo else "No"
+            imagen_url = producto.imagen or 'Sin imagen'
+            contenido.append(f"{producto.id} | {producto.nombre} | {producto.descripcion or 'Sin descripción'} | {producto.precio} | {producto.stock} | {categoria_nombre} | {estado} | {imagen_url}")
+        
+        contenido.append("")
+        contenido.append("=== FIN DE EXPORTACIÓN ===")
+        
+        # Crear respuesta con el archivo
+        output = io.StringIO()
+        output.write('\n'.join(contenido))
+        output.seek(0)
+        
+        from flask import Response
+        return Response(
+            output.getvalue(),
+            mimetype='text/plain',
+            headers={
+                'Content-Disposition': f'attachment; filename=productos_exportados_{datetime.now().strftime("%Y%m%d_%H%M%S")}.txt'
+            }
+        )
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error al exportar productos: {str(e)}'
+        }), 500
+
+@app.route('/api/productos/importar', methods=['POST'])
+@login_required
+def importar_productos():
+    """Importa productos desde un archivo de texto"""
+    try:
+        if 'archivo' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'No se ha enviado ningún archivo'
+            }), 400
+        
+        archivo = request.files['archivo']
+        if archivo.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'No se ha seleccionado ningún archivo'
+            }), 400
+        
+        # Leer el contenido del archivo
+        contenido = archivo.read().decode('utf-8')
+        lineas = contenido.split('\n')
+        
+        # Obtener mapeo de categorías por nombre
+        categorias = {cat.nombre.lower(): cat.id for cat in Categoria.query.all()}
+        
+        productos_importados = 0
+        productos_actualizados = 0
+        categorias_creadas = 0
+        errores = []
+        
+        # Procesar cada línea
+        for i, linea in enumerate(lineas, 1):
+            linea = linea.strip()
+            
+            # Saltar líneas vacías, comentarios y encabezados
+            if not linea or linea.startswith('===') or linea.startswith('FORMATO:') or linea.startswith('-') or 'ID | NOMBRE' in linea:
+                continue
+            
+            # Dividir la línea por el separador |
+            partes = [parte.strip() for parte in linea.split('|')]
+            
+            # Verificar si es el formato nuevo (con imagen) o el formato anterior (sin imagen)
+            if len(partes) < 7:
+                errores.append(f"Línea {i}: Formato incorrecto (faltan campos)")
+                continue
+            
+            try:
+                # Extraer datos
+                id_producto = partes[0] if partes[0] else None
+                nombre = partes[1]
+                descripcion = partes[2] if partes[2] != 'Sin descripción' else ''
+                precio = float(partes[3])
+                stock = int(partes[4])
+                categoria_nombre = partes[5]
+                activo = partes[6].lower() in ['sí', 'si', 'yes', 'true', '1']
+                
+                # Procesar URL de imagen (puede estar en la posición 7 o no existir)
+                imagen_url = ''
+                if len(partes) >= 8:
+                    imagen_url = partes[7] if partes[7] != 'Sin imagen' else ''
+                elif len(partes) == 7:
+                    # Formato anterior sin imagen
+                    imagen_url = ''
+                
+                # Validar datos obligatorios
+                if not nombre:
+                    errores.append(f"Línea {i}: El nombre es obligatorio")
+                    continue
+                
+                if precio < 0:
+                    errores.append(f"Línea {i}: El precio no puede ser negativo")
+                    continue
+                
+                if stock < 0:
+                    errores.append(f"Línea {i}: El stock no puede ser negativo")
+                    continue
+                
+                # Buscar o crear categoría
+                categoria_id = None
+                if categoria_nombre and categoria_nombre != 'Sin categoría':
+                    categoria_id = categorias.get(categoria_nombre.lower())
+                    if not categoria_id:
+                        # Crear nueva categoría automáticamente
+                        try:
+                            nueva_categoria = Categoria(
+                                nombre=categoria_nombre,
+                                descripcion=f'Categoría creada automáticamente al importar productos',
+                                icono='fas fa-tag',  # Icono por defecto
+                                color='#007bff'  # Color azul por defecto
+                            )
+                            db.session.add(nueva_categoria)
+                            db.session.flush()  # Para obtener el ID
+                            
+                            # Actualizar el mapeo de categorías
+                            categorias[categoria_nombre.lower()] = nueva_categoria.id
+                            categoria_id = nueva_categoria.id
+                            categorias_creadas += 1
+                            
+                        except Exception as e:
+                            errores.append(f"Línea {i}: Error al crear categoría '{categoria_nombre}': {str(e)}")
+                            continue
+                
+                # Verificar si el producto ya existe (por ID o nombre)
+                producto_existente = None
+                if id_producto and id_producto.isdigit():
+                    producto_existente = Producto.query.get(int(id_producto))
+                
+                if not producto_existente:
+                    producto_existente = Producto.query.filter_by(nombre=nombre).first()
+                
+                if producto_existente:
+                    # Actualizar producto existente
+                    producto_existente.descripcion = descripcion
+                    producto_existente.precio = precio
+                    producto_existente.stock = stock
+                    producto_existente.categoria_id = categoria_id
+                    producto_existente.activo = activo
+                    # Solo actualizar la imagen si se proporciona una URL válida
+                    if imagen_url and imagen_url.strip():
+                        producto_existente.imagen = imagen_url.strip()
+                    productos_actualizados += 1
+                else:
+                    # Crear nuevo producto
+                    nuevo_producto = Producto(
+                        nombre=nombre,
+                        descripcion=descripcion,
+                        precio=precio,
+                        stock=stock,
+                        categoria_id=categoria_id,
+                        activo=activo,
+                        imagen=imagen_url.strip() if imagen_url and imagen_url.strip() else ''
+                    )
+                    db.session.add(nuevo_producto)
+                    productos_importados += 1
+                
+            except ValueError as e:
+                errores.append(f"Línea {i}: Error en formato de datos - {str(e)}")
+                continue
+            except Exception as e:
+                errores.append(f"Línea {i}: Error inesperado - {str(e)}")
+                continue
+        
+        # Guardar cambios en la base de datos
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'mensaje': f'Importación completada exitosamente',
+            'detalles': {
+                'productos_importados': productos_importados,
+                'productos_actualizados': productos_actualizados,
+                'categorias_creadas': categorias_creadas,
+                'errores': len(errores),
+                'lista_errores': errores[:10]  # Solo mostrar los primeros 10 errores
+            }
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': f'Error al importar productos: {str(e)}'
         }), 500
 
 # ===== RUTAS PRINCIPALES =====

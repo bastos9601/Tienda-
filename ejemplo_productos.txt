@@ -1,0 +1,16 @@
+=== EXPORTACIÓN DE PRODUCTOS ===
+Fecha de exportación: 15/12/2024 10:30:00
+Total de productos: 6
+
+FORMATO:
+ID | NOMBRE | DESCRIPCIÓN | PRECIO | STOCK | CATEGORÍA | ACTIVO | IMAGEN_URL
+----------------------------------------------------------------------------------------------------
+
+1 | Pizza Margherita | Pizza clásica con tomate, mozzarella y albahaca | 12.99 | 10 | Comida Rápida | Sí | https://res.cloudinary.com/ejemplo/image/upload/v1234567890/pizza_margherita.jpg
+2 | Hamburguesa Clásica | Hamburguesa con carne, lechuga, tomate y queso | 8.99 | 15 | Comida Rápida | Sí | https://res.cloudinary.com/ejemplo/image/upload/v1234567890/hamburguesa_clasica.jpg
+3 | Ensalada César | Ensalada fresca con pollo, lechuga y aderezo césar | 6.99 | 8 | Saludable | Sí | Sin imagen
+4 | Coca Cola | Refresco de cola 500ml | 2.50 | 20 | Bebidas | Sí | https://res.cloudinary.com/ejemplo/image/upload/v1234567890/coca_cola.jpg
+5 | Laptop Gaming | Laptop para juegos de alta gama | 1500.00 | 3 | Electrónicos | Sí | https://res.cloudinary.com/ejemplo/image/upload/v1234567890/laptop_gaming.jpg
+6 | Camiseta Deportiva | Camiseta para deportes | 25.00 | 50 | Ropa | Sí | Sin imagen
+
+=== FIN DE EXPORTACIÓN ===

@@ -12,6 +12,11 @@ WHATSAPP_TOKEN=tu_token_de_whatsapp
 WHATSAPP_PHONE_ID=tu_phone_id
 WHATSAPP_RECIPIENT=51999999999
 
+# Configuración de Cloudinary (configurar en Koyeb)
+CLOUDINARY_CLOUD_NAME=dp1dzunfp
+CLOUDINARY_API_KEY=tu_api_key_real_aqui
+CLOUDINARY_API_SECRET=tu_api_secret_real_aqui
+
 # Configuración de Flask
 FLASK_ENV=development
 FLASK_DEBUG=True

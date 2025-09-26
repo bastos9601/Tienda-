@@ -20,6 +20,12 @@ services:
         value: tu_phone_id
       - key: WHATSAPP_RECIPIENT
         value: 51999999999
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dp1dzunfp
+      - key: CLOUDINARY_API_KEY
+        value: tu_api_key_real_aqui
+      - key: CLOUDINARY_API_SECRET
+        value: tu_api_secret_real_aqui
       - key: FLASK_ENV
         value: production
     regions:
