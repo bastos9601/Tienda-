@@ -10,14 +10,21 @@ import requests
 import json
 import cloudinary
 import cloudinary.uploader
+import cloudinary.api
 from werkzeug.utils import secure_filename
 import uuid
-from datetime import datetime
 import csv
 import io
 
 # Cargar variables de entorno
 load_dotenv()
+
+# Configurar Cloudinary
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tu-clave-secreta-aqui')
@@ -204,6 +211,26 @@ class Configuracion(db.Model):
         db.session.commit()
         return config
 
+class Banner(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    imagen_url = db.Column(db.String(500), nullable=False)
+    texto = db.Column(db.String(200))
+    activo = db.Column(db.Boolean, default=True)
+    orden = db.Column(db.Integer, default=0)  # Para ordenar los banners
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'nombre': self.nombre,
+            'imagen_url': self.imagen_url,
+            'texto': self.texto,
+            'activo': self.activo,
+            'orden': self.orden,
+            'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None
+        }
+
 # Función para cargar usuarios (requerida por Flask-Login)
 @login_manager.user_loader
 def load_user(user_id):
@@ -341,6 +368,88 @@ def subir_imagen_cloudinary(archivo, nombre_producto=''):
     except Exception as e:
         print(f"❌ Error al subir imagen a Cloudinary: {str(e)}")
         return None
+
+def subir_logo_cloudinary(archivo):
+    """Sube un logo a Cloudinary y retorna la URL y error"""
+    if not CLOUDINARY_CLOUD_NAME or not CLOUDINARY_API_KEY or not CLOUDINARY_API_SECRET:
+        return None, "Configuración de Cloudinary no encontrada"
+    
+    try:
+        # Validar que el archivo sea una imagen
+        if not archivo or not archivo.filename:
+            return None, "No se seleccionó ningún archivo"
+        
+        # Verificar extensión del archivo
+        extensiones_permitidas = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        if '.' not in archivo.filename or archivo.filename.rsplit('.', 1)[1].lower() not in extensiones_permitidas:
+            return None, "Formato de archivo no permitido. Use PNG, JPG, JPEG, GIF o WEBP"
+        
+        # Generar nombre único para el archivo
+        nombre_archivo = f"logos/{uuid.uuid4().hex}"
+        
+        # Subir a Cloudinary
+        resultado = cloudinary.uploader.upload(
+            archivo,
+            public_id=nombre_archivo,
+            folder="logos",
+            resource_type="image",
+            transformation=[
+                {'width': 300, 'height': 300, 'crop': 'limit'},
+                {'quality': 'auto'},
+                {'format': 'auto'}
+            ]
+        )
+        
+        return resultado['secure_url'], None
+        
+    except Exception as e:
+        print(f"❌ Error al subir logo a Cloudinary: {str(e)}")
+        return None, f"Error al subir logo: {str(e)}"
+
+def subir_banner_cloudinary(archivo):
+    """Sube un banner a Cloudinary y retorna la URL y error"""
+    if not CLOUDINARY_CLOUD_NAME or not CLOUDINARY_API_KEY or not CLOUDINARY_API_SECRET:
+        return None, "Configuración de Cloudinary no encontrada"
+    
+    try:
+        # Validar que el archivo sea una imagen
+        if not archivo or not archivo.filename:
+            return None, "No se seleccionó ningún archivo"
+        
+        # Verificar extensión del archivo
+        extensiones_permitidas = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        if '.' not in archivo.filename or archivo.filename.rsplit('.', 1)[1].lower() not in extensiones_permitidas:
+            return None, "Formato de archivo no permitido. Use PNG, JPG, JPEG, GIF o WEBP"
+        
+        # Generar nombre único para el archivo
+        nombre_archivo = f"banners/{uuid.uuid4().hex}"
+        
+        # Subir a Cloudinary
+        resultado = cloudinary.uploader.upload(
+            archivo,
+            public_id=nombre_archivo,
+            folder="banners",
+            resource_type="image",
+            transformation=[
+                {'width': 1200, 'height': 300, 'crop': 'limit'},
+                {'quality': 'auto'},
+                {'format': 'auto'}
+            ]
+        )
+        
+        return resultado['secure_url'], None
+        
+    except Exception as e:
+        print(f"❌ Error al subir banner a Cloudinary: {str(e)}")
+        return None, f"Error al subir banner: {str(e)}"
+
+def verificar_imagen_cloudinary(url):
+    """Verifica si una imagen de Cloudinary existe"""
+    try:
+        response = requests.head(url, timeout=10)
+        return response.status_code == 200
+    except:
+        return False
 
 def eliminar_imagen_cloudinary(url_imagen):
     """Elimina una imagen de Cloudinary basándose en su URL"""
@@ -1094,6 +1203,10 @@ def get_configuracion():
         nombre_tienda = Configuracion.get_valor('nombre_tienda', 'Mi Tienda Online')
         descripcion_tienda = Configuracion.get_valor('descripcion_tienda', '')
         whatsapp_admin = Configuracion.get_valor('whatsapp_admin', '')
+        logo_url = Configuracion.get_valor('logo_url', '')
+        banner_url = Configuracion.get_valor('banner_url', '')
+        banner_text = Configuracion.get_valor('banner_text', '')
+        banner_activo = Configuracion.get_valor('banner_activo', 'false')
         
         # Obtener fecha de última actualización
         config_nombre = Configuracion.query.filter_by(clave='nombre_tienda').first()
@@ -1105,6 +1218,10 @@ def get_configuracion():
                 'nombre_tienda': nombre_tienda,
                 'descripcion_tienda': descripcion_tienda,
                 'whatsapp_admin': whatsapp_admin,
+                'logo_url': logo_url,
+                'banner_url': banner_url,
+                'banner_text': banner_text,
+                'banner_activo': banner_activo == 'true',
                 'ultima_actualizacion': ultima_actualizacion
             }
         })
@@ -1123,6 +1240,9 @@ def update_configuracion():
         nombre_tienda = data.get('nombre_tienda', '').strip()
         descripcion_tienda = data.get('descripcion_tienda', '').strip()
         whatsapp_admin = data.get('whatsapp_admin', '').strip()
+        logo_url = data.get('logo_url', '').strip()
+        banner_text = data.get('banner_text', '').strip()
+        banner_activo = data.get('banner_activo', False)
         
         if not nombre_tienda:
             return jsonify({
@@ -1134,6 +1254,9 @@ def update_configuracion():
         Configuracion.set_valor('nombre_tienda', nombre_tienda, 'Nombre de la tienda que aparece en el encabezado')
         Configuracion.set_valor('descripcion_tienda', descripcion_tienda, 'Descripción de la tienda que aparece en la página principal')
         Configuracion.set_valor('whatsapp_admin', whatsapp_admin, 'Número de WhatsApp del administrador para contacto')
+        Configuracion.set_valor('logo_url', logo_url, 'URL del logo de la tienda')
+        Configuracion.set_valor('banner_text', banner_text, 'Texto del banner de anuncio')
+        Configuracion.set_valor('banner_activo', str(banner_activo).lower(), 'Estado del banner (activo/inactivo)')
         
         # Obtener fecha de actualización
         config_nombre = Configuracion.query.filter_by(clave='nombre_tienda').first()
@@ -1151,6 +1274,133 @@ def update_configuracion():
             'error': str(e)
         }), 500
 
+@app.route('/api/configuracion/logo', methods=['POST'])
+@login_required
+def subir_logo():
+    """Sube un logo a Cloudinary y actualiza la configuración"""
+    try:
+        if 'logo' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'No se seleccionó ningún archivo'
+            }), 400
+        
+        archivo = request.files['logo']
+        
+        if archivo.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'No se seleccionó ningún archivo'
+            }), 400
+        
+        # Subir imagen a Cloudinary
+        url_logo, error = subir_logo_cloudinary(archivo)
+        
+        if error:
+            return jsonify({
+                'success': False,
+                'error': error
+            }), 400
+        
+        # Obtener el logo anterior para eliminarlo
+        logo_anterior = Configuracion.get_valor('logo_url', '')
+        
+        # Actualizar la configuración con la nueva URL
+        Configuracion.set_valor('logo_url', url_logo, 'URL del logo de la tienda')
+        
+        # Eliminar el logo anterior de Cloudinary si existe
+        if logo_anterior:
+            eliminar_imagen_cloudinary(logo_anterior)
+        
+        return jsonify({
+            'success': True,
+            'mensaje': 'Logo actualizado exitosamente',
+            'logo_url': url_logo
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/configuracion/banner', methods=['POST'])
+@login_required
+def subir_banner():
+    """Sube un banner a Cloudinary y actualiza la configuración"""
+    try:
+        if 'banner' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'No se seleccionó ningún archivo'
+            }), 400
+        
+        archivo = request.files['banner']
+        
+        if archivo.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'No se seleccionó ningún archivo'
+            }), 400
+        
+        # Subir imagen a Cloudinary
+        url_banner, error = subir_banner_cloudinary(archivo)
+        
+        if error:
+            return jsonify({
+                'success': False,
+                'error': error
+            }), 400
+        
+        # Obtener el banner anterior para eliminarlo
+        banner_anterior = Configuracion.get_valor('banner_url', '')
+        
+        # Actualizar la configuración con la nueva URL
+        Configuracion.set_valor('banner_url', url_banner, 'URL del banner de anuncio')
+        
+        # Eliminar el banner anterior de Cloudinary si existe
+        if banner_anterior:
+            eliminar_imagen_cloudinary(banner_anterior)
+        
+        return jsonify({
+            'success': True,
+            'mensaje': 'Banner actualizado exitosamente',
+            'banner_url': url_banner
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/configuracion/banner', methods=['DELETE'])
+@login_required
+def eliminar_banner():
+    """Elimina el banner de Cloudinary y de la configuración"""
+    try:
+        # Obtener el banner actual
+        banner_url = Configuracion.get_valor('banner_url', '')
+        
+        if banner_url:
+            # Eliminar de Cloudinary
+            eliminar_imagen_cloudinary(banner_url)
+            
+            # Eliminar de la configuración
+            Configuracion.set_valor('banner_url', '', 'URL del banner de anuncio')
+            Configuracion.set_valor('banner_activo', 'false', 'Estado del banner (activo/inactivo)')
+        
+        return jsonify({
+            'success': True,
+            'mensaje': 'Banner eliminado exitosamente'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/configuracion/publica', methods=['GET'])
 def get_configuracion_publica():
     """Obtiene la configuración pública de la tienda (sin login)"""
@@ -1158,14 +1408,256 @@ def get_configuracion_publica():
         nombre_tienda = Configuracion.get_valor('nombre_tienda', 'Mi Tienda Online')
         descripcion_tienda = Configuracion.get_valor('descripcion_tienda', '')
         whatsapp_admin = Configuracion.get_valor('whatsapp_admin', '')
+        logo_url = Configuracion.get_valor('logo_url', '')
+        
+        # Obtener colores de la tienda
+        colores = {
+            'color_primario': Configuracion.get_valor('color_primario', '#007bff'),
+            'color_secundario': Configuracion.get_valor('color_secundario', '#6c757d'),
+            'color_exito': Configuracion.get_valor('color_exito', '#28a745'),
+            'color_peligro': Configuracion.get_valor('color_peligro', '#dc3545'),
+            'color_advertencia': Configuracion.get_valor('color_advertencia', '#ffc107'),
+            'color_info': Configuracion.get_valor('color_info', '#17a2b8'),
+            'color_fondo': Configuracion.get_valor('color_fondo', '#ffffff'),
+            'color_texto': Configuracion.get_valor('color_texto', '#333333'),
+            'color_fondo_secundario': Configuracion.get_valor('color_fondo_secundario', '#f8f9fa'),
+            'color_borde': Configuracion.get_valor('color_borde', '#dee2e6')
+        }
+        
+        # Obtener banners activos ordenados
+        banners = Banner.query.filter_by(activo=True).order_by(Banner.orden.asc()).all()
+        banners_data = [banner.to_dict() for banner in banners]
         
         return jsonify({
             'success': True,
             'configuracion': {
                 'nombre_tienda': nombre_tienda,
                 'descripcion_tienda': descripcion_tienda,
-                'whatsapp_admin': whatsapp_admin
+                'whatsapp_admin': whatsapp_admin,
+                'logo_url': logo_url,
+                'banners': banners_data,
+                'colores': colores
             }
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Rutas para manejar múltiples banners
+@app.route('/api/banners', methods=['GET'])
+@login_required
+def get_banners():
+    """Obtiene todos los banners"""
+    try:
+        banners = Banner.query.order_by(Banner.orden.asc()).all()
+        return jsonify({
+            'success': True,
+            'banners': [banner.to_dict() for banner in banners]
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/banners', methods=['POST'])
+@login_required
+def crear_banner():
+    """Crea un nuevo banner"""
+    try:
+        if 'imagen' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'No se seleccionó ninguna imagen'
+            }), 400
+        
+        archivo = request.files['imagen']
+        nombre = request.form.get('nombre', '').strip()
+        texto = request.form.get('texto', '').strip()
+        
+        if not nombre:
+            return jsonify({
+                'success': False,
+                'error': 'El nombre del banner es obligatorio'
+            }), 400
+        
+        # Subir imagen a Cloudinary
+        url, error = subir_banner_cloudinary(archivo)
+        if error:
+            return jsonify({
+                'success': False,
+                'error': error
+            }), 400
+        
+        # Obtener el siguiente orden
+        ultimo_banner = Banner.query.order_by(Banner.orden.desc()).first()
+        siguiente_orden = (ultimo_banner.orden + 1) if ultimo_banner else 1
+        
+        # Crear nuevo banner
+        banner = Banner(
+            nombre=nombre,
+            imagen_url=url,
+            texto=texto,
+            orden=siguiente_orden
+        )
+        
+        db.session.add(banner)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'banner': banner.to_dict(),
+            'message': 'Banner creado exitosamente'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/banners/<int:banner_id>', methods=['PUT'])
+@login_required
+def actualizar_banner(banner_id):
+    """Actualiza un banner existente"""
+    try:
+        banner = Banner.query.get_or_404(banner_id)
+        data = request.json
+        
+        banner.nombre = data.get('nombre', banner.nombre)
+        banner.texto = data.get('texto', banner.texto)
+        banner.activo = data.get('activo', banner.activo)
+        banner.orden = data.get('orden', banner.orden)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'banner': banner.to_dict(),
+            'message': 'Banner actualizado exitosamente'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/banners/<int:banner_id>', methods=['DELETE'])
+@login_required
+def eliminar_banner_multiple(banner_id):
+    """Elimina un banner"""
+    try:
+        banner = Banner.query.get_or_404(banner_id)
+        
+        # Eliminar de Cloudinary (opcional, ya que las imágenes pueden reutilizarse)
+        # Por ahora solo eliminamos de la base de datos
+        
+        db.session.delete(banner)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Banner eliminado exitosamente'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/verificar-imagenes', methods=['GET'])
+@login_required
+def verificar_imagenes_productos():
+    """Verifica el estado de las imágenes de los productos"""
+    try:
+        productos = Producto.query.all()
+        resultados = []
+        
+        for producto in productos:
+            if producto.imagen:
+                existe = verificar_imagen_cloudinary(producto.imagen)
+                resultados.append({
+                    'id': producto.id,
+                    'nombre': producto.nombre,
+                    'imagen_url': producto.imagen,
+                    'existe': existe,
+                    'status': 'OK' if existe else 'ERROR'
+                })
+            else:
+                resultados.append({
+                    'id': producto.id,
+                    'nombre': producto.nombre,
+                    'imagen_url': None,
+                    'existe': False,
+                    'status': 'SIN_IMAGEN'
+                })
+        
+        return jsonify({
+            'success': True,
+            'productos': resultados
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/configuracion/colores', methods=['GET'])
+@login_required
+def get_colores():
+    """Obtiene los colores actuales de la tienda"""
+    try:
+        colores = {
+            'color_primario': Configuracion.get_valor('color_primario', '#007bff'),
+            'color_secundario': Configuracion.get_valor('color_secundario', '#6c757d'),
+            'color_exito': Configuracion.get_valor('color_exito', '#28a745'),
+            'color_peligro': Configuracion.get_valor('color_peligro', '#dc3545'),
+            'color_advertencia': Configuracion.get_valor('color_advertencia', '#ffc107'),
+            'color_info': Configuracion.get_valor('color_info', '#17a2b8'),
+            'color_fondo': Configuracion.get_valor('color_fondo', '#ffffff'),
+            'color_texto': Configuracion.get_valor('color_texto', '#333333'),
+            'color_fondo_secundario': Configuracion.get_valor('color_fondo_secundario', '#f8f9fa'),
+            'color_borde': Configuracion.get_valor('color_borde', '#dee2e6')
+        }
+        
+        return jsonify({
+            'success': True,
+            'colores': colores
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/configuracion/colores', methods=['POST'])
+@login_required
+def update_colores():
+    """Actualiza los colores de la tienda"""
+    try:
+        data = request.json
+        colores_actualizados = 0
+        
+        # Lista de colores válidos
+        colores_validos = [
+            'color_primario', 'color_secundario', 'color_exito', 'color_peligro',
+            'color_advertencia', 'color_info', 'color_fondo', 'color_texto',
+            'color_fondo_secundario', 'color_borde'
+        ]
+        
+        for color_key in colores_validos:
+            if color_key in data:
+                color_value = data[color_key].strip()
+                # Validar que sea un color hexadecimal válido
+                if color_value.startswith('#') and len(color_value) == 7:
+                    Configuracion.set_valor(color_key, color_value, f'Color {color_key.replace("_", " ").title()}')
+                    colores_actualizados += 1
+        
+        return jsonify({
+            'success': True,
+            'message': f'{colores_actualizados} colores actualizados exitosamente',
+            'colores_actualizados': colores_actualizados
         })
     except Exception as e:
         return jsonify({

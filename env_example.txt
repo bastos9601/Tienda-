@@ -1,22 +1,17 @@
-# Variables de entorno para producción
-SECRET_KEY=tu-clave-secreta-muy-segura-aqui
-FLASK_ENV=production
-FLASK_DEBUG=False
+# Configuración para desarrollo local
+SECRET_KEY=tu-clave-secreta-aqui
+DATABASE_URL=sqlite:///instance/tienda.db
 
-# Configuración de base de datos (AlwaysData usará PostgreSQL)
-DATABASE_URL=postgres://koyeb-adm:npg_GSYqNavA69Rh@ep-weathered-hat-a42ecxew.us-east-1.pg.koyeb.app/koyebdb
+# Configuración de Cloudinary (obtén estos valores de cloudinary.com)
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
 
-# Configuración de Twilio (si usas SMS)
-TWILIO_ACCOUNT_SID=tu_account_sid
-TWILIO_AUTH_TOKEN=tu_auth_token
-TWILIO_PHONE_NUMBER=tu_numero_twilio
+# Configuración de WhatsApp (opcional)
+WHATSAPP_TOKEN=tu_token_de_whatsapp
+WHATSAPP_PHONE_ID=tu_phone_id
+WHATSAPP_RECIPIENT=51999999999
 
-# Configuración de WhatsApp
-WHATSAPP_TOKEN=tu_whatsapp_token
-WHATSAPP_PHONE_ID=tu_whatsapp_phone_id
-WHATSAPP_RECIPIENT=tu_numero_whatsapp
-
-# Configuración de Cloudinary
-CLOUDINARY_CLOUD_NAME=dp1dzunfp
-CLOUDINARY_API_KEY=258478459326466
-CLOUDINARY_API_SECRET=lnHcXW--2xkJDd27CsYpXxlxaDk
+# Configuración de Flask
+FLASK_ENV=development
+FLASK_DEBUG=True

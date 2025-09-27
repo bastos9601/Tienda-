@@ -7,6 +7,125 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* Variables CSS dinámicas para colores personalizables */
+        :root {
+            --color-primario: #007bff;
+            --color-secundario: #6c757d;
+            --color-exito: #28a745;
+            --color-peligro: #dc3545;
+            --color-advertencia: #ffc107;
+            --color-info: #17a2b8;
+            --color-fondo: #ffffff;
+            --color-texto: #333333;
+            --color-fondo-secundario: #f8f9fa;
+            --color-borde: #dee2e6;
+        }
+        
+        /* Aplicar colores dinámicos a elementos principales */
+        .navbar-dark.bg-primary {
+            background-color: var(--color-primario) !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--color-primario);
+            border-color: var(--color-primario);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--color-primario);
+            border-color: var(--color-primario);
+            opacity: 0.9;
+        }
+        
+        .btn-success {
+            background-color: var(--color-exito);
+            border-color: var(--color-exito);
+        }
+        
+        .btn-danger {
+            background-color: var(--color-peligro);
+            border-color: var(--color-peligro);
+        }
+        
+        .btn-warning {
+            background-color: var(--color-advertencia);
+            border-color: var(--color-advertencia);
+            color: #000000;
+        }
+        
+        .btn-info {
+            background-color: var(--color-info);
+            border-color: var(--color-info);
+        }
+        
+        .text-primary {
+            color: var(--color-primario) !important;
+        }
+        
+        /* Asegurar que los iconos mantengan su apariencia correcta */
+        .fas.text-primary,
+        .far.text-primary,
+        .fab.text-primary {
+            color: var(--color-primario) !important;
+            background: none !important;
+        }
+        
+        .text-success {
+            color: var(--color-exito) !important;
+            background: none !important;
+        }
+        
+        .text-danger {
+            color: var(--color-peligro) !important;
+            background: none !important;
+        }
+        
+        .text-warning {
+            color: var(--color-advertencia) !important;
+            background: none !important;
+        }
+        
+        .text-info {
+            color: var(--color-info) !important;
+            background: none !important;
+        }
+        
+        .bg-primary {
+            background-color: var(--color-primario) !important;
+        }
+        
+        .bg-success {
+            background-color: var(--color-exito) !important;
+        }
+        
+        .bg-danger {
+            background-color: var(--color-peligro) !important;
+        }
+        
+        .bg-warning {
+            background-color: var(--color-advertencia) !important;
+        }
+        
+        .bg-info {
+            background-color: var(--color-info) !important;
+        }
+        
+        .badge.bg-success {
+            background-color: var(--color-exito) !important;
+        }
+        
+        .badge.bg-danger {
+            background-color: var(--color-peligro) !important;
+        }
+        
+        .badge.bg-warning {
+            background-color: var(--color-advertencia) !important;
+        }
+        
+        .badge.bg-info {
+            background-color: var(--color-info) !important;
+        }
+        
         .product-card {
             transition: transform 0.3s ease;
             height: 100%;
@@ -179,13 +298,128 @@
         .text-warning {
             color: #fd7e14 !important;
         }
+        
+        /* Estilos para el Banner de Anuncio */
+        .banner-anuncio {
+            background: transparent; /* Sin fondo */
+            padding: 20px 0; /* Padding vertical */
+            margin-bottom: 20px;
+        }
+        
+        /* Ocultar banner en páginas de admin */
+        body.admin-page .banner-anuncio {
+            display: none !important;
+        }
+        
+        .banner-content {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            max-width: 1200px; /* Limitar el ancho máximo */
+            margin: 0 auto; /* Centrar el banner */
+            height: 300px;/* Sin altura fija - se adapta a la imagen */
+        }
+        
+        .banner-content .carousel-item img {
+            width: 100%;
+            height: 300px; /* Altura automática según proporción de la imagen */
+            display: block; /* Elimina espacios en blanco */
+        }
+        
+        .banner-content .carousel-item {
+            position: relative;
+        }
+        
+        .banner-content .carousel-indicators {
+            bottom: 10px;
+        }
+        
+        .banner-content .carousel-indicators button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+        
+        .banner-content .carousel-control-prev,
+        .banner-content .carousel-control-next {
+            width: 5%;
+        }
+        
+        .banner-text-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .banner-title {
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            margin: 0;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .banner-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .banner-content {
+                max-width: 100%;
+                margin: 0 15px; /* Margen lateral en pantallas medianas */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .banner-title {
+                font-size: 1.5rem;
+            }
+            
+            .banner-anuncio {
+                padding: 15px 0; /* Padding reducido en móviles */
+            }
+            
+            .banner-content {
+                margin: 0 10px; /* Margen lateral reducido en móviles */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .banner-title {
+                font-size: 1.2rem;
+            }
+            
+            .banner-anuncio {
+                padding: 10px 0; /* Padding mínimo en pantallas pequeñas */
+            }
+            
+            .banner-content {
+                margin: 0 5px; /* Margen lateral mínimo */
+            }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-store"></i> <span id="nombre-tienda">Mi Tienda Online</span>
+                <img id="logo-tienda" src="" alt="Logo" style="height: 30px; margin-right: 8px; display: none;">
+                <i class="fas fa-store" id="icono-tienda"></i> <span id="nombre-tienda">Mi Tienda Online</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -228,6 +462,30 @@
             </div>
         </div>
     </nav>
+
+    <!-- Carrusel de Banners -->
+    <div id="banner-container" class="banner-anuncio" style="display: none;">
+        <div class="container">
+            <div class="banner-content">
+                <div id="banner-carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="40000">
+                    <div class="carousel-inner" id="banner-carousel-inner">
+                        <!-- Los banners se cargarán aquí dinámicamente -->
+                    </div>
+                    <!-- Indicadores del carrusel (solo si hay más de un banner) -->
+                    <div class="carousel-indicators" id="banner-indicators">
+                        <!-- Se generarán dinámicamente -->
+                    </div>
+                    <!-- Controles de navegación (solo si hay más de un banner) -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#banner-carousel" data-bs-slide="prev" id="banner-prev" style="display: none;">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#banner-carousel" data-bs-slide="next" id="banner-next" style="display: none;">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <main class="container mt-4">
         <!-- Mostrar mensajes flash -->
@@ -961,6 +1219,228 @@
                     console.log('No se pudo cargar el WhatsApp del administrador');
                 });
         }
+        
+        // Cargar configuración de la tienda
+        function cargarConfiguracionTienda() {
+            fetch('/api/configuracion/publica')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const config = data.configuracion;
+                        
+                        // Actualizar nombre de la tienda
+                        document.getElementById('nombre-tienda').textContent = config.nombre_tienda || 'Mi Tienda Online';
+                        
+                        // Actualizar logo
+                        const logoImg = document.getElementById('logo-tienda');
+                        const iconoStore = document.getElementById('icono-tienda');
+                        
+                        if (config.logo_url) {
+                            logoImg.src = config.logo_url;
+                            logoImg.style.display = 'inline-block';
+                            iconoStore.style.display = 'none';
+                        } else {
+                            logoImg.style.display = 'none';
+                            iconoStore.style.display = 'inline-block';
+                        }
+                        
+                        // Actualizar carrusel de banners
+                        mostrarCarruselBanners(config.banners);
+                    }
+                })
+                .catch(error => {
+                    console.log('No se pudo cargar la configuración de la tienda');
+                });
+        }
+        
+        // Función para mostrar el carrusel de banners
+        function mostrarCarruselBanners(banners) {
+            const bannerContainer = document.getElementById('banner-container');
+            const carouselInner = document.getElementById('banner-carousel-inner');
+            const indicators = document.getElementById('banner-indicators');
+            const prevBtn = document.getElementById('banner-prev');
+            const nextBtn = document.getElementById('banner-next');
+            
+            // Ocultar banner si estamos en la página de admin
+            if (window.location.pathname.includes('/admin')) {
+                bannerContainer.style.display = 'none';
+                return;
+            }
+            
+            if (!banners || banners.length === 0) {
+                bannerContainer.style.display = 'none';
+                return;
+            }
+            
+            // Limpiar contenido anterior
+            carouselInner.innerHTML = '';
+            indicators.innerHTML = '';
+            
+            // Crear elementos del carrusel
+            banners.forEach((banner, index) => {
+                // Crear item del carrusel
+                const carouselItem = document.createElement('div');
+                carouselItem.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+                carouselItem.innerHTML = `
+                    <img src="${banner.imagen_url}" alt="${banner.nombre}" class="d-block w-100">
+                    ${banner.texto ? `
+                        <div class="banner-text-overlay">
+                            <h3 class="banner-title">${banner.texto}</h3>
+                        </div>
+                    ` : ''}
+                `;
+                carouselInner.appendChild(carouselItem);
+                
+                // Crear indicador
+                const indicator = document.createElement('button');
+                indicator.type = 'button';
+                indicator.setAttribute('data-bs-target', '#banner-carousel');
+                indicator.setAttribute('data-bs-slide-to', index);
+                indicator.className = index === 0 ? 'active' : '';
+                indicator.setAttribute('aria-current', index === 0 ? 'true' : 'false');
+                indicator.setAttribute('aria-label', `Slide ${index + 1}`);
+                indicators.appendChild(indicator);
+            });
+            
+            // Mostrar/ocultar controles según la cantidad de banners
+            if (banners.length > 1) {
+                prevBtn.style.display = 'block';
+                nextBtn.style.display = 'block';
+                indicators.style.display = 'block';
+            } else {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                indicators.style.display = 'none';
+            }
+            
+            // Mostrar el contenedor del banner
+            bannerContainer.style.display = 'block';
+        }
+        
+        // Función para aplicar colores dinámicamente
+        function aplicarColoresDinamicos() {
+            fetch('/api/configuracion/publica')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.configuracion.colores) {
+                        const colores = data.configuracion.colores;
+                        
+                        // Crear variables CSS dinámicas
+                        const root = document.documentElement;
+                        root.style.setProperty('--color-primario', colores.color_primario);
+                        root.style.setProperty('--color-secundario', colores.color_secundario);
+                        root.style.setProperty('--color-exito', colores.color_exito);
+                        root.style.setProperty('--color-peligro', colores.color_peligro);
+                        root.style.setProperty('--color-advertencia', colores.color_advertencia);
+                        root.style.setProperty('--color-info', colores.color_info);
+                        root.style.setProperty('--color-fondo', colores.color_fondo);
+                        root.style.setProperty('--color-texto', colores.color_texto);
+                        root.style.setProperty('--color-fondo-secundario', colores.color_fondo_secundario);
+                        root.style.setProperty('--color-borde', colores.color_borde);
+                        
+                        // Aplicar colores específicos a elementos
+                        aplicarColoresElementos(colores);
+                    }
+                })
+                .catch(error => {
+                    console.log('No se pudieron cargar los colores personalizados');
+                });
+        }
+        
+        function aplicarColoresElementos(colores) {
+            // Aplicar color primario a elementos específicos (excluyendo iconos)
+            const elementosPrimarios = document.querySelectorAll('.btn-primary, .bg-primary, .navbar-dark.bg-primary');
+            elementosPrimarios.forEach(elemento => {
+                elemento.style.backgroundColor = colores.color_primario;
+                elemento.style.borderColor = colores.color_primario;
+                elemento.style.color = '#ffffff';
+            });
+            
+            // Aplicar color primario solo a texto, no a iconos
+            const textosPrimarios = document.querySelectorAll('.text-primary:not(.fas):not(.far):not(.fab):not(.fa)');
+            textosPrimarios.forEach(elemento => {
+                elemento.style.color = colores.color_primario;
+            });
+            
+            // Aplicar color primario a iconos de forma específica
+            const iconosPrimarios = document.querySelectorAll('.fas.text-primary, .far.text-primary, .fab.text-primary');
+            iconosPrimarios.forEach(elemento => {
+                elemento.style.color = colores.color_primario;
+                elemento.style.backgroundColor = 'transparent';
+            });
+            
+            // Aplicar color primario al botón del menú desplegable de categorías
+            const dropdownToggle = document.querySelector('.category-dropdown .dropdown-toggle');
+            if (dropdownToggle) {
+                dropdownToggle.style.backgroundColor = colores.color_primario;
+                dropdownToggle.style.borderColor = colores.color_primario;
+            }
+            
+            // Aplicar color de fondo
+            document.body.style.backgroundColor = colores.color_fondo;
+            document.body.style.color = colores.color_texto;
+            
+            // Aplicar colores a botones de categorías
+            const botonesCategoria = document.querySelectorAll('.category-btn');
+            botonesCategoria.forEach(boton => {
+                if (boton.classList.contains('active')) {
+                    boton.style.backgroundColor = colores.color_primario;
+                    boton.style.borderColor = colores.color_primario;
+                    boton.style.color = '#ffffff';
+                }
+            });
+            
+            // Aplicar colores a elementos de éxito (solo botones y badges, no texto)
+            const elementosExito = document.querySelectorAll('.btn-success, .bg-success, .badge.bg-success');
+            elementosExito.forEach(elemento => {
+                elemento.style.backgroundColor = colores.color_exito;
+                elemento.style.borderColor = colores.color_exito;
+                elemento.style.color = '#ffffff';
+            });
+            
+            // Aplicar solo color de texto a elementos .text-success
+            const textosExito = document.querySelectorAll('.text-success:not(.btn):not(.badge)');
+            textosExito.forEach(elemento => {
+                elemento.style.color = colores.color_exito;
+                elemento.style.backgroundColor = 'transparent';
+            });
+            
+            // Aplicar colores a elementos de peligro (solo botones y badges, no texto)
+            const elementosPeligro = document.querySelectorAll('.btn-danger, .bg-danger, .badge.bg-danger');
+            elementosPeligro.forEach(elemento => {
+                elemento.style.backgroundColor = colores.color_peligro;
+                elemento.style.borderColor = colores.color_peligro;
+                elemento.style.color = '#ffffff';
+            });
+            
+            // Aplicar solo color de texto a elementos .text-danger
+            const textosPeligro = document.querySelectorAll('.text-danger:not(.btn):not(.badge)');
+            textosPeligro.forEach(elemento => {
+                elemento.style.color = colores.color_peligro;
+                elemento.style.backgroundColor = 'transparent';
+            });
+            
+            // Aplicar colores a elementos de advertencia (solo botones y badges, no texto)
+            const elementosAdvertencia = document.querySelectorAll('.btn-warning, .bg-warning, .badge.bg-warning');
+            elementosAdvertencia.forEach(elemento => {
+                elemento.style.backgroundColor = colores.color_advertencia;
+                elemento.style.borderColor = colores.color_advertencia;
+                elemento.style.color = '#000000';
+            });
+            
+            // Aplicar solo color de texto a elementos .text-warning
+            const textosAdvertencia = document.querySelectorAll('.text-warning:not(.btn):not(.badge)');
+            textosAdvertencia.forEach(elemento => {
+                elemento.style.color = colores.color_advertencia;
+                elemento.style.backgroundColor = 'transparent';
+            });
+        }
+        
+        // Cargar configuración al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarConfiguracionTienda();
+            aplicarColoresDinamicos();
+        });
     </script>
 </body>
 </html>

@@ -520,6 +520,37 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <div class="mb-3">
+                                            <label for="logo_tienda" class="form-label">
+                                                <i class="fas fa-image text-primary"></i> Logo de la Tienda
+                                            </label>
+                                            <input type="file" class="form-control" id="logo_tienda" accept="image/*">
+                                            <div class="form-text">Sube el logo de tu tienda (PNG, JPG, JPEG, GIF, WEBP - Máx. 5MB)</div>
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-outline-primary btn-sm" id="subirLogoBtn">
+                                                    <i class="fas fa-upload"></i> Subir Logo
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="eliminarLogoBtn" style="display: none;">
+                                                    <i class="fas fa-trash"></i> Eliminar Logo
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Vista Previa del Logo</label>
+                                            <div class="border rounded p-2 bg-light text-center">
+                                                <div id="preview_logo" class="d-flex align-items-center justify-content-center" style="min-height: 60px;">
+                                                    <i class="fas fa-image text-muted fa-2x"></i>
+                                                    <span class="text-muted ms-2">Sin logo</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
                                             <label for="whatsapp_admin" class="form-label">
                                                 <i class="fab fa-whatsapp text-success"></i> WhatsApp del Administrador
                                             </label>
@@ -557,6 +588,240 @@
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+                
+                <!-- Sección de Colores -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-palette"></i> Colores de la Tienda</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="coloresForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3"><i class="fas fa-paint-brush"></i> Colores Principales</h6>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_primario" class="form-label">
+                                            <i class="fas fa-circle text-primary"></i> Color Primario
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_primario" value="#007bff">
+                                            <input type="text" class="form-control" id="color_primario_text" value="#007bff" readonly>
+                                        </div>
+                                        <div class="form-text">Color principal de la tienda (botones, enlaces, etc.)</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_secundario" class="form-label">
+                                            <i class="fas fa-circle text-secondary"></i> Color Secundario
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_secundario" value="#6c757d">
+                                            <input type="text" class="form-control" id="color_secundario_text" value="#6c757d" readonly>
+                                        </div>
+                                        <div class="form-text">Color secundario para elementos complementarios</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_exito" class="form-label">
+                                            <i class="fas fa-circle text-success"></i> Color de Éxito
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_exito" value="#28a745">
+                                            <input type="text" class="form-control" id="color_exito_text" value="#28a745" readonly>
+                                        </div>
+                                        <div class="form-text">Color para mensajes de éxito y confirmaciones</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_peligro" class="form-label">
+                                            <i class="fas fa-circle text-danger"></i> Color de Peligro
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_peligro" value="#dc3545">
+                                            <input type="text" class="form-control" id="color_peligro_text" value="#dc3545" readonly>
+                                        </div>
+                                        <div class="form-text">Color para mensajes de error y advertencias</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_advertencia" class="form-label">
+                                            <i class="fas fa-circle text-warning"></i> Color de Advertencia
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_advertencia" value="#ffc107">
+                                            <input type="text" class="form-control" id="color_advertencia_text" value="#ffc107" readonly>
+                                        </div>
+                                        <div class="form-text">Color para mensajes de advertencia</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6 class="mb-3"><i class="fas fa-palette"></i> Colores de Fondo y Texto</h6>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_fondo" class="form-label">
+                                            <i class="fas fa-square text-light"></i> Color de Fondo
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_fondo" value="#ffffff">
+                                            <input type="text" class="form-control" id="color_fondo_text" value="#ffffff" readonly>
+                                        </div>
+                                        <div class="form-text">Color de fondo principal de la página</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_texto" class="form-label">
+                                            <i class="fas fa-font text-dark"></i> Color de Texto
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_texto" value="#333333">
+                                            <input type="text" class="form-control" id="color_texto_text" value="#333333" readonly>
+                                        </div>
+                                        <div class="form-text">Color principal del texto</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_fondo_secundario" class="form-label">
+                                            <i class="fas fa-square text-light"></i> Fondo Secundario
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_fondo_secundario" value="#f8f9fa">
+                                            <input type="text" class="form-control" id="color_fondo_secundario_text" value="#f8f9fa" readonly>
+                                        </div>
+                                        <div class="form-text">Color de fondo para secciones secundarias</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_borde" class="form-label">
+                                            <i class="fas fa-square text-secondary"></i> Color de Borde
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_borde" value="#dee2e6">
+                                            <input type="text" class="form-control" id="color_borde_text" value="#dee2e6" readonly>
+                                        </div>
+                                        <div class="form-text">Color para bordes y separadores</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="color_info" class="form-label">
+                                            <i class="fas fa-circle text-info"></i> Color de Información
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="color" class="form-control form-control-color" id="color_info" value="#17a2b8">
+                                            <input type="text" class="form-control" id="color_info_text" value="#17a2b8" readonly>
+                                        </div>
+                                        <div class="form-text">Color para mensajes informativos</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div>
+                                    <button type="button" class="btn btn-primary" id="guardarColoresBtn">
+                                        <i class="fas fa-save"></i> Guardar Colores
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary ms-2" id="restaurarColoresBtn">
+                                        <i class="fas fa-undo"></i> Restaurar por Defecto
+                                    </button>
+                                </div>
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle"></i> Los cambios se aplicarán inmediatamente
+                                    </small>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Sección de Banners Múltiples -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-images"></i> Carrusel de Banners</h5>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#nuevoBannerModal">
+                            <i class="fas fa-plus"></i> Nuevo Banner
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="bannersList">
+                            <!-- Los banners se cargarán aquí dinámicamente -->
+                        </div>
+                        <div id="noBannersMessage" class="text-center py-4" style="display: none;">
+                            <i class="fas fa-images text-muted fa-3x"></i>
+                            <p class="text-muted mt-2">No hay banners creados</p>
+                            <p class="text-muted">Haz clic en "Nuevo Banner" para crear el primero</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para Nuevo Banner -->
+                <div class="modal fade" id="nuevoBannerModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-plus"></i> Nuevo Banner
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="nuevoBannerForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="banner_nombre" class="form-label">
+                                                    <i class="fas fa-tag"></i> Nombre del Banner
+                                                </label>
+                                                <input type="text" class="form-control" id="banner_nombre" 
+                                                       placeholder="Ej: Oferta Navidad" maxlength="100" required>
+                                                <div class="form-text">Nombre para identificar el banner</div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="banner_texto" class="form-label">
+                                                    <i class="fas fa-font"></i> Texto del Banner
+                                                </label>
+                                                <input type="text" class="form-control" id="banner_texto" 
+                                                       placeholder="Ej: ¡Oferta especial! 20% de descuento" maxlength="200">
+                                                <div class="form-text">Texto que aparecerá sobre el banner (opcional)</div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="banner_imagen_nueva" class="form-label">
+                                                    <i class="fas fa-image text-primary"></i> Imagen del Banner
+                                                </label>
+                                                <input type="file" class="form-control" id="banner_imagen_nueva" accept="image/*" required>
+                                                <div class="form-text">PNG, JPG, JPEG, GIF, WEBP - Máx. 5MB</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Vista Previa</label>
+                                                <div class="border rounded p-2 bg-light text-center">
+                                                    <div id="preview_nuevo_banner" class="d-flex align-items-center justify-content-center" style="min-height: 150px;">
+                                                        <div class="text-center">
+                                                            <i class="fas fa-image text-muted fa-3x"></i>
+                                                            <p class="text-muted mt-2">Selecciona una imagen</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button type="button" class="btn btn-primary" id="crearBannerBtn">
+                                    <i class="fas fa-save"></i> Crear Banner
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1676,11 +1941,22 @@
                     document.getElementById('preview_nombre').textContent = config.nombre_tienda || 'Mi Tienda Online';
                     document.getElementById('preview_descripcion').textContent = config.descripcion_tienda || 'Descripción de la tienda';
                     document.getElementById('preview_whatsapp').textContent = config.whatsapp_admin || 'Sin WhatsApp configurado';
+                    
+                    // Actualizar vista previa del logo
+                    actualizarVistaPreviaLogo(config.logo_url || '');
+                    
+                    // Actualizar configuración del banner
+                    document.getElementById('banner_text').value = config.banner_text || '';
+                    document.getElementById('banner_activo').checked = config.banner_activo || false;
+                    actualizarVistaPreviaBanner(config.banner_url || '', config.banner_text || '');
                 }
             })
             .catch(error => {
                 console.error('Error al cargar configuración:', error);
             });
+            
+        // Cargar colores
+        cargarColores();
     }
     
     function guardarConfiguracion() {
@@ -1728,6 +2004,487 @@
             btn.innerHTML = originalHTML;
             btn.disabled = false;
         });
+    }
+    
+    // ===== FUNCIONES DEL LOGO =====
+    
+    // Event listeners para el logo
+    document.getElementById('subirLogoBtn').addEventListener('click', function() {
+        subirLogo();
+    });
+    
+    document.getElementById('eliminarLogoBtn').addEventListener('click', function() {
+        eliminarLogo();
+    });
+    
+    // Vista previa del archivo seleccionado
+    document.getElementById('logo_tienda').addEventListener('change', function() {
+        const archivo = this.files[0];
+        if (archivo) {
+            // Validar tamaño (máx. 5MB)
+            if (archivo.size > 5 * 1024 * 1024) {
+                alert('⚠️ El archivo es demasiado grande. Máximo 5MB permitido.');
+                this.value = '';
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const tiposPermitidos = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
+            if (!tiposPermitidos.includes(archivo.type)) {
+                alert('⚠️ Formato de archivo no permitido. Use PNG, JPG, JPEG, GIF o WEBP.');
+                this.value = '';
+                return;
+            }
+            
+            // Mostrar vista previa
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mostrarVistaPreviaArchivo(e.target.result);
+            };
+            reader.readAsDataURL(archivo);
+        }
+    });
+    
+    function subirLogo() {
+        const archivo = document.getElementById('logo_tienda').files[0];
+        
+        if (!archivo) {
+            alert('⚠️ Por favor selecciona un archivo de imagen');
+            return;
+        }
+        
+        const btn = document.getElementById('subirLogoBtn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo...';
+        btn.disabled = true;
+        
+        const formData = new FormData();
+        formData.append('logo', archivo);
+        
+        fetch('/api/configuracion/logo', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Logo actualizado exitosamente');
+                actualizarVistaPreviaLogo(data.logo_url);
+                document.getElementById('logo_tienda').value = '';
+            } else {
+                alert('❌ Error al subir logo: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al subir logo');
+        })
+        .finally(() => {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        });
+    }
+    
+    function eliminarLogo() {
+        if (!confirm('¿Estás seguro de que quieres eliminar el logo actual?')) {
+            return;
+        }
+        
+        const btn = document.getElementById('eliminarLogoBtn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+        btn.disabled = true;
+        
+        fetch('/api/configuracion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nombre_tienda: document.getElementById('nombre_tienda').value,
+                descripcion_tienda: document.getElementById('descripcion_tienda').value,
+                whatsapp_admin: document.getElementById('whatsapp_admin').value,
+                logo_url: ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Logo eliminado exitosamente');
+                actualizarVistaPreviaLogo('');
+            } else {
+                alert('❌ Error al eliminar logo: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al eliminar logo');
+        })
+        .finally(() => {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        });
+    }
+    
+    function actualizarVistaPreviaLogo(logoUrl) {
+        const previewDiv = document.getElementById('preview_logo');
+        const eliminarBtn = document.getElementById('eliminarLogoBtn');
+        
+        if (logoUrl) {
+            previewDiv.innerHTML = `<img src="${logoUrl}" alt="Logo" style="max-width: 100%; max-height: 60px; object-fit: contain;">`;
+            eliminarBtn.style.display = 'inline-block';
+        } else {
+            previewDiv.innerHTML = '<i class="fas fa-image text-muted fa-2x"></i><span class="text-muted ms-2">Sin logo</span>';
+            eliminarBtn.style.display = 'none';
+        }
+    }
+    
+    function mostrarVistaPreviaArchivo(dataUrl) {
+        const previewDiv = document.getElementById('preview_logo');
+        previewDiv.innerHTML = `<img src="${dataUrl}" alt="Vista previa" style="max-width: 100%; max-height: 60px; object-fit: contain;">`;
+    }
+    
+    // ===== FUNCIONES DEL BANNER =====
+    
+    // ===== GESTIÓN DE MÚLTIPLES BANNERS =====
+    
+    // Cargar banners al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        cargarBanners();
+    });
+    
+    // Event listeners para múltiples banners
+    document.getElementById('crearBannerBtn').addEventListener('click', function() {
+        crearBanner();
+    });
+    
+    // Vista previa del archivo seleccionado en el modal
+    document.getElementById('banner_imagen_nueva').addEventListener('change', function() {
+        const archivo = this.files[0];
+        if (archivo) {
+            // Validar tamaño (máx. 5MB)
+            if (archivo.size > 5 * 1024 * 1024) {
+                alert('⚠️ El archivo es demasiado grande. Máximo 5MB permitido.');
+                this.value = '';
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const tiposPermitidos = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/webp'];
+            if (!tiposPermitidos.includes(archivo.type)) {
+                alert('⚠️ Formato de archivo no permitido. Use PNG, JPG, JPEG, GIF o WEBP.');
+                this.value = '';
+                return;
+            }
+            
+            // Mostrar vista previa
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mostrarVistaPreviaNuevoBanner(e.target.result);
+            };
+            reader.readAsDataURL(archivo);
+        }
+    });
+    
+    function cargarBanners() {
+        fetch('/api/banners')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mostrarBanners(data.banners);
+            } else {
+                console.error('Error al cargar banners:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+    function mostrarBanners(banners) {
+        const bannersList = document.getElementById('bannersList');
+        const noBannersMessage = document.getElementById('noBannersMessage');
+        
+        if (banners.length === 0) {
+            bannersList.innerHTML = '';
+            noBannersMessage.style.display = 'block';
+            return;
+        }
+        
+        noBannersMessage.style.display = 'none';
+        bannersList.innerHTML = banners.map(banner => `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title mb-0">${banner.nombre}</h6>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="banner_activo_${banner.id}" 
+                                       ${banner.activo ? 'checked' : ''} onchange="toggleBanner(${banner.id}, this.checked)">
+                            </div>
+                        </div>
+                        <div class="text-center mb-3">
+                            <img src="${banner.imagen_url}" alt="${banner.nombre}" 
+                                 class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+                        </div>
+                        ${banner.texto ? `<p class="card-text small text-muted">"${banner.texto}"</p>` : ''}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">Orden: ${banner.orden}</small>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="eliminarBanner(${banner.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function crearBanner() {
+        const nombre = document.getElementById('banner_nombre').value.trim();
+        const texto = document.getElementById('banner_texto').value.trim();
+        const archivo = document.getElementById('banner_imagen_nueva').files[0];
+        
+        if (!nombre) {
+            alert('⚠️ El nombre del banner es obligatorio');
+            return;
+        }
+        
+        if (!archivo) {
+            alert('⚠️ Por favor selecciona una imagen');
+            return;
+        }
+        
+        const btn = document.getElementById('crearBannerBtn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+        btn.disabled = true;
+        
+        const formData = new FormData();
+        formData.append('imagen', archivo);
+        formData.append('nombre', nombre);
+        formData.append('texto', texto);
+        
+        fetch('/api/banners', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Banner creado exitosamente');
+                // Cerrar modal y limpiar formulario
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevoBannerModal'));
+                modal.hide();
+                limpiarFormularioBanner();
+                cargarBanners(); // Recargar la lista
+            } else {
+                alert('❌ Error al crear banner: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al crear banner');
+        })
+        .finally(() => {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        });
+    }
+    
+    function toggleBanner(bannerId, activo) {
+        fetch(`/api/banners/${bannerId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ activo: activo })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar la lista
+                cargarBanners();
+            } else {
+                alert('❌ Error al actualizar banner: ' + data.error);
+                // Revertir el checkbox
+                document.getElementById(`banner_activo_${bannerId}`).checked = !activo;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al actualizar banner');
+            // Revertir el checkbox
+            document.getElementById(`banner_activo_${bannerId}`).checked = !activo;
+        });
+    }
+    
+    function eliminarBanner(bannerId) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este banner?')) {
+            return;
+        }
+        
+        fetch(`/api/banners/${bannerId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Banner eliminado exitosamente');
+                cargarBanners(); // Recargar la lista
+            } else {
+                alert('❌ Error al eliminar banner: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al eliminar banner');
+        });
+    }
+    
+    function mostrarVistaPreviaNuevoBanner(dataUrl) {
+        const previewDiv = document.getElementById('preview_nuevo_banner');
+        const bannerText = document.getElementById('banner_texto').value;
+        previewDiv.innerHTML = `
+            <div class="w-100">
+                <img src="${dataUrl}" alt="Vista previa" style="max-width: 100%; max-height: 120px; object-fit: cover; border-radius: 4px;">
+                ${bannerText ? `<p class="mt-2 mb-0 small text-muted">"${bannerText}"</p>` : ''}
+            </div>
+        `;
+    }
+    
+    function limpiarFormularioBanner() {
+        document.getElementById('banner_nombre').value = '';
+        document.getElementById('banner_texto').value = '';
+        document.getElementById('banner_imagen_nueva').value = '';
+        document.getElementById('preview_nuevo_banner').innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-image text-muted fa-3x"></i>
+                <p class="text-muted mt-2">Selecciona una imagen</p>
+            </div>
+        `;
+    }
+    
+    // ===== GESTIÓN DE COLORES =====
+    
+    // Event listeners para colores
+    document.getElementById('guardarColoresBtn').addEventListener('click', function() {
+        guardarColores();
+    });
+    
+    document.getElementById('restaurarColoresBtn').addEventListener('click', function() {
+        restaurarColoresDefault();
+    });
+    
+    // Sincronizar inputs de color con inputs de texto
+    const colorInputs = document.querySelectorAll('input[type="color"]');
+    colorInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const textInput = document.getElementById(this.id + '_text');
+            if (textInput) {
+                textInput.value = this.value;
+            }
+        });
+    });
+    
+    function cargarColores() {
+        fetch('/api/configuracion/colores')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const colores = data.colores;
+                
+                // Actualizar todos los inputs de color
+                Object.keys(colores).forEach(colorKey => {
+                    const colorInput = document.getElementById(colorKey);
+                    const textInput = document.getElementById(colorKey + '_text');
+                    
+                    if (colorInput && textInput) {
+                        colorInput.value = colores[colorKey];
+                        textInput.value = colores[colorKey];
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar colores:', error);
+        });
+    }
+    
+    function guardarColores() {
+        const colores = {};
+        const colorInputs = document.querySelectorAll('input[type="color"]');
+        
+        colorInputs.forEach(input => {
+            colores[input.id] = input.value;
+        });
+        
+        const btn = document.getElementById('guardarColoresBtn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        btn.disabled = true;
+        
+        fetch('/api/configuracion/colores', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(colores)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Colores guardados exitosamente');
+                // Recargar la página para aplicar los cambios
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                alert('❌ Error al guardar colores: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al guardar colores');
+        })
+        .finally(() => {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        });
+    }
+    
+    function restaurarColoresDefault() {
+        if (!confirm('¿Estás seguro de que quieres restaurar los colores por defecto?')) {
+            return;
+        }
+        
+        const coloresDefault = {
+            'color_primario': '#007bff',
+            'color_secundario': '#6c757d',
+            'color_exito': '#28a745',
+            'color_peligro': '#dc3545',
+            'color_advertencia': '#ffc107',
+            'color_info': '#17a2b8',
+            'color_fondo': '#ffffff',
+            'color_texto': '#333333',
+            'color_fondo_secundario': '#f8f9fa',
+            'color_borde': '#dee2e6'
+        };
+        
+        // Actualizar los inputs
+        Object.keys(coloresDefault).forEach(colorKey => {
+            const colorInput = document.getElementById(colorKey);
+            const textInput = document.getElementById(colorKey + '_text');
+            
+            if (colorInput && textInput) {
+                colorInput.value = coloresDefault[colorKey];
+                textInput.value = coloresDefault[colorKey];
+            }
+        });
+        
+        alert('✅ Colores restaurados por defecto. Haz clic en "Guardar Colores" para aplicar los cambios.');
     }
     
     // ===== CAMBIO DE CONTRASEÑA =====

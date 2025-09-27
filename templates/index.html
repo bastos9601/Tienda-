@@ -23,7 +23,8 @@
         {% if categorias %}
         <div class="row mb-4">
             <div class="col-12">
-                <div class="category-filters">
+                <!-- Botones de categorías para desktop -->
+                <div class="category-filters d-none d-lg-flex">
                     <button class="btn btn-outline-primary category-btn active" data-category="all">
                         <i class="fas fa-th"></i> Todos
                     </button>
@@ -32,6 +33,29 @@
                         <i class="{{ categoria.icono }}"></i> {{ categoria.nombre }}
                     </button>
                     {% endfor %}
+                </div>
+                
+                <!-- Menú desplegable para móviles y tablets -->
+                <div class="category-dropdown d-lg-none">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle w-100" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-th"></i> <span id="selectedCategory">Todos</span>
+                        </button>
+                        <ul class="dropdown-menu w-100" aria-labelledby="categoryDropdown">
+                            <li>
+                                <a class="dropdown-item category-dropdown-item active" href="#" data-category="all">
+                                    <i class="fas fa-th"></i> Todos
+                                </a>
+                            </li>
+                            {% for categoria in categorias %}
+                            <li>
+                                <a class="dropdown-item category-dropdown-item" href="#" data-category="{{ categoria.id }}">
+                                    <i class="{{ categoria.icono }}" style="color: {{ categoria.color }};"></i> {{ categoria.nombre }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -407,6 +431,61 @@
         border-color: #007bff;
     }
     
+    /* Category Dropdown para móviles */
+    .category-dropdown {
+        margin-bottom: 30px;
+    }
+    
+    .category-dropdown .dropdown-toggle {
+        border-radius: 25px;
+        padding: 12px 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: var(--color-primario, #007bff);
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .category-dropdown .dropdown-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        opacity: 0.9;
+    }
+    
+    .category-dropdown .dropdown-menu {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        padding: 10px 0;
+        margin-top: 5px;
+    }
+    
+    .category-dropdown-item {
+        padding: 12px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        background: none;
+    }
+    
+    .category-dropdown-item:hover {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        transform: translateX(5px);
+    }
+    
+    .category-dropdown-item.active {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+    }
+    
+    .category-dropdown-item i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+    
     .category-badge {
         position: absolute;
         top: 15px;
@@ -429,18 +508,39 @@
     }
     
     /* Responsive */
+    @media (max-width: 991px) {
+        .category-filters {
+            display: none !important;
+        }
+        
+        .category-dropdown {
+            display: block !important;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .category-filters {
+            display: flex !important;
+        }
+        
+        .category-dropdown {
+            display: none !important;
+        }
+    }
+    
     @media (max-width: 768px) {
         .section-title {
             font-size: 2rem;
         }
         
-        .category-filters {
-            flex-direction: column;
-            align-items: center;
+        .category-dropdown .dropdown-toggle {
+            font-size: 0.9rem;
+            padding: 10px 15px;
         }
         
-        .category-btn {
-            width: 200px;
+        .category-dropdown-item {
+            padding: 10px 15px;
+            font-size: 0.9rem;
         }
     }
 </style>
@@ -474,8 +574,8 @@
     }
     
     function inicializarFiltrosCategoria() {
+        // Inicializar botones de categorías para desktop
         const categoryBtns = document.querySelectorAll('.category-btn');
-        
         categoryBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 // Remover clase active de todos los botones
@@ -489,6 +589,38 @@
                 
                 // Filtrar productos
                 filtrarProductos(categoriaId);
+            });
+        });
+        
+        // Inicializar menú desplegable para móviles
+        const categoryDropdownItems = document.querySelectorAll('.category-dropdown-item');
+        const selectedCategorySpan = document.getElementById('selectedCategory');
+        
+        categoryDropdownItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remover clase active de todos los items
+                categoryDropdownItems.forEach(i => i.classList.remove('active'));
+                
+                // Agregar clase active al item clickeado
+                this.classList.add('active');
+                
+                // Actualizar el texto del botón
+                const categoryText = this.textContent.trim();
+                selectedCategorySpan.textContent = categoryText;
+                
+                // Obtener la categoría seleccionada
+                const categoriaId = this.getAttribute('data-category');
+                
+                // Filtrar productos
+                filtrarProductos(categoriaId);
+                
+                // Cerrar el dropdown
+                const dropdown = bootstrap.Dropdown.getInstance(document.getElementById('categoryDropdown'));
+                if (dropdown) {
+                    dropdown.hide();
+                }
             });
         });
     }
